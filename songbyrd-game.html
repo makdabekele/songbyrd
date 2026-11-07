@@ -1,0 +1,844 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Find Your Songbyrd Show</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Didact+Gothic&display=swap">
+<style>
+/* Layout: one phone-width column, a "this or that" game that ends on a paper ticket stub.
+   Palette borrowed from Makda's pitch deck. Swap in hand-drawn assets wherever you see ASSET. */
+:root{
+  --red:#E0494F;      /* main background */
+  --teal:#7EC4D4;     /* card B, accents */
+  --yellow:#F5EE5A;   /* headlines, card A */
+  --navy:#26295E;     /* text, outlines */
+  --paper:#FBF6E9;    /* ticket stub */
+  --green:#3E9A57;    /* "go" states */
+  --display:"Space Mono", ui-monospace, Menlo, monospace;
+  --body:"Didact Gothic", "Century Gothic", "Avenir Next", system-ui, sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--red);color:var(--navy);font-family:var(--body);font-size:17px;line-height:1.45;
+  padding:max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+.app{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.top{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow)}
+h1,h2{font-family:var(--display);font-weight:700;line-height:1;margin:0;text-wrap:balance}
+h1{font-size:44px;color:var(--yellow)}
+h2{font-size:26px}
+p{margin:0}
+.btn{
+  font-family:var(--display);font-weight:700;font-size:17px;border:3px solid var(--navy);border-radius:4px;
+  background:var(--yellow);color:var(--navy);padding:14px 18px;cursor:pointer;box-shadow:4px 4px 0 var(--navy);
+  text-decoration:none;display:inline-block;text-align:center;
+}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--navy)}
+.btn.ghost{background:transparent;color:var(--yellow);border-color:var(--yellow);box-shadow:none}
+.btn:focus-visible,select:focus-visible,input:focus-visible,.card:focus-visible{outline:3px dashed var(--yellow);outline-offset:3px}
+.screen[hidden]{display:none!important}
+.screen{display:flex;flex-direction:column;gap:18px}
+.lede{color:var(--paper);font-size:19px}
+label{font-family:var(--display);font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--yellow)}
+select,input[type=email]{width:100%;font:inherit;padding:12px;border:3px solid var(--navy);border-radius:4px;background:var(--paper);color:var(--navy)}
+.field{display:flex;flex-direction:column;gap:6px}
+.small{font-size:13px;color:var(--paper);opacity:.9}
+
+/* Bird (ASSET: replace the SVG with your drawings: bird-idle / bird-happy / bird-wow / bird-meh) */
+.birdrow{display:flex;align-items:center;gap:12px}
+.bird{width:64px;height:64px;flex:none;transition:transform .25s}
+.bird.happy{transform:rotate(-10deg) scale(1.08)}
+.bird.wow{transform:translateY(-8px) scale(1.12)}
+.bird.meh{transform:rotate(8deg) scale(.95)}
+.bubble{background:var(--paper);border:3px solid var(--navy);border-radius:14px;padding:8px 12px;font-family:var(--display);font-size:14px;position:relative}
+
+/* Progress */
+.progress{display:flex;gap:6px}
+.progress span{flex:1;height:10px;border:2px solid var(--navy);background:var(--paper);border-radius:2px}
+.progress span.done{background:var(--yellow)}
+.progress span.now{background:var(--teal)}
+
+/* Round cards */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{
+  border:3px solid var(--navy);border-radius:6px;padding:14px 12px;display:flex;flex-direction:column;gap:10px;align-items:center;
+  box-shadow:5px 5px 0 var(--navy);cursor:pointer;min-width:0;text-align:center;
+}
+.card.a{background:var(--yellow)}
+.card.b{background:var(--teal)}
+.card .letter{font-family:var(--display);font-weight:700;font-size:28px;line-height:1}
+.record{width:100%;max-width:150px;aspect-ratio:1;border-radius:50%;
+  background:repeating-radial-gradient(circle,#1d1f45 0 3px,#2c2f66 3px 5px);display:grid;place-items:center;position:relative}
+.record::after{content:"";width:34%;aspect-ratio:1;border-radius:50%;background:var(--paper);border:3px solid var(--navy)}
+.card.playing .record{animation:spin 1.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.card .hint{font-family:var(--display);font-size:12px;text-transform:uppercase}
+.bars{display:flex;gap:3px;height:16px;align-items:flex-end}
+.bars i{width:5px;background:var(--navy);height:3px}
+.card.playing .bars i{animation:bar .6s ease-in-out infinite alternate}
+.card.playing .bars i:nth-child(2){animation-delay:.15s}.card.playing .bars i:nth-child(3){animation-delay:.3s}.card.playing .bars i:nth-child(4){animation-delay:.45s}
+@keyframes bar{to{height:16px}}
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.neither{justify-self:center}
+.reveal{background:var(--paper);border:3px solid var(--navy);border-radius:6px;padding:12px;font-size:15px;min-height:52px}
+.reveal b{font-family:var(--display)}
+.unavailable{font-size:13px}
+
+/* Ticket stub */
+.stub{background:var(--paper);border:3px solid var(--navy);border-radius:6px;position:relative;box-shadow:6px 6px 0 var(--navy)}
+.stub .main{padding:18px;display:flex;flex-direction:column;gap:10px}
+.stub .perf{border-top:3px dashed var(--navy);margin:0 14px}
+.stub .tear{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--display);font-size:13px}
+.stub::before,.stub::after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:var(--red);border:3px solid var(--navy);top:calc(100% - 64px)}
+.stub::before{left:-14px}.stub::after{right:-14px}
+.eyebrow{font-family:var(--display);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.showname{font-family:var(--display);font-weight:700;font-size:28px;line-height:1.05;text-wrap:balance}
+.meta{font-size:15px}
+.stamp{align-self:flex-start;font-family:var(--display);font-weight:700;font-size:13px;color:var(--green);border:3px solid var(--green);padding:4px 8px;transform:rotate(-4deg);text-transform:uppercase}
+.mix{display:flex;flex-direction:column;gap:6px}
+.mixrow{display:grid;grid-template-columns:88px 1fr 40px;gap:8px;align-items:center;font-size:14px}
+.mixbar{height:12px;border:2px solid var(--navy);background:#fff}
+.mixbar i{display:block;height:100%;background:var(--red)}
+.mixrow .pct{font-family:var(--display);font-variant-numeric:tabular-nums;text-align:right}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions .btn{flex:1 1 140px}
+.runner{background:var(--paper);border:3px solid var(--navy);border-radius:6px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.runner .n{font-family:var(--display);font-weight:700;font-size:15px}
+.runner a{font-family:var(--display);font-size:13px;color:var(--navy)}
+.also{background:var(--teal);border:3px solid var(--navy);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+.email{background:var(--paper);border:3px solid var(--navy);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.email label{color:var(--navy)}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:13px}
+.sectionlabel{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow)}
+.applelink{font-size:13px;color:var(--navy)}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="top"><span>Songbyrd Music House</span><span>540 Penn St NE</span></div>
+
+  <!-- START -->
+  <section class="screen" id="s-start">
+    <h1>Find Your Songbyrd Show</h1>
+    <p class="lede">8 rounds of this or that. Pick the song you'd rather hear, and we'll match you to a show at Songbyrd this semester.</p>
+    <div class="birdrow">
+      <svg class="bird" id="bird0" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="38" rx="20" ry="16" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="42" cy="24" r="11" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="45" cy="22" r="2.5" fill="#26295E"/><path d="M52 25 l9 2 l-9 4z" fill="#E0494F" stroke="#26295E" stroke-width="2"/><path d="M14 34 q-10 4 -6 14" fill="none" stroke="#26295E" stroke-width="3"/></svg>
+      <div class="bubble">Headphones on. Tap a record to listen.</div>
+    </div>
+    <div class="field">
+      <label for="school">Where do you go?</label>
+      <select id="school">
+        <option value="">Pick your school</option>
+        <option>George Washington (GW)</option><option>Georgetown</option><option>American (AU)</option>
+        <option>Howard</option><option>Catholic</option><option>Gallaudet</option><option>UDC</option>
+        <option>University of Maryland</option><option>Other school</option><option>Not a student</option>
+      </select>
+    </div>
+    <button class="btn" id="go">Start</button>
+  </section>
+
+  <!-- ROUND -->
+  <section class="screen" id="s-round" hidden>
+    <div class="progress" id="progress"></div>
+    <div class="birdrow">
+      <svg class="bird" id="bird" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="38" rx="20" ry="16" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="42" cy="24" r="11" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="45" cy="22" r="2.5" fill="#26295E"/><path d="M52 25 l9 2 l-9 4z" fill="#E0494F" stroke="#26295E" stroke-width="2"/><path d="M14 34 q-10 4 -6 14" fill="none" stroke="#26295E" stroke-width="3"/></svg>
+      <div class="bubble" id="bubble">Round 1. Tap A, then B.</div>
+    </div>
+    <div class="vs">
+      <div class="card a" id="cardA" tabindex="0" role="button" aria-label="Play song A">
+        <span class="letter">A</span><div class="record"></div><div class="bars"><i></i><i></i><i></i><i></i></div><span class="hint" id="hintA">Tap to play</span>
+      </div>
+      <div class="card b" id="cardB" tabindex="0" role="button" aria-label="Play song B">
+        <span class="letter">B</span><div class="record"></div><div class="bars"><i></i><i></i><i></i><i></i></div><span class="hint" id="hintB">Tap to play</span>
+      </div>
+    </div>
+    <div class="picks">
+      <button class="btn" id="pickA">I pick A</button>
+      <button class="btn" id="pickB" style="background:var(--teal)">I pick B</button>
+    </div>
+    <button class="btn ghost neither" id="pickN">Neither</button>
+    <div class="reveal" id="reveal" aria-live="polite">Your picks show up here.</div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="s-result" hidden>
+    <div class="birdrow">
+      <svg class="bird wow" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="38" rx="20" ry="16" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="42" cy="24" r="11" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="45" cy="22" r="2.5" fill="#26295E"/><path d="M52 25 l9 2 l-9 4z" fill="#E0494F" stroke="#26295E" stroke-width="2"/><path d="M14 34 q-10 4 -6 14" fill="none" stroke="#26295E" stroke-width="3"/></svg>
+      <div class="bubble">Your ticket's ready.</div>
+    </div>
+    <div class="stub" id="stub"></div>
+    <div class="actions">
+      <button class="btn" id="share">Save my ticket</button>
+      <button class="btn ghost" id="again">Play again</button>
+    </div>
+    <div class="email" id="emailBox">
+      <label for="email">Get a reminder before your show</label>
+      <input type="email" id="email" placeholder="you@school.edu" autocomplete="email">
+      <label class="check" for="consent"><input type="checkbox" id="consent"> <span>Songbyrd can email me about upcoming shows. Unsubscribe anytime.</span></label>
+      <button class="btn" id="emailGo">Send it</button>
+      <p class="small" id="emailMsg" style="color:var(--navy)"></p>
+    </div>
+    <div class="sectionlabel">Two more you might like</div>
+    <div id="runners" style="display:flex;flex-direction:column;gap:10px"></div>
+    <div class="also" id="also"></div>
+  </section>
+</main>
+
+<script>
+/* ===================== SETTINGS ===================== */
+const LOG_ENDPOINT = "";          // Paste your Google Apps Script web-app URL here to save plays to a Google Sheet.
+const ROUNDS = 8;
+const CLIP_SECONDS = 12;          // how long each clip plays per tap
+
+/* Songbyrd shows: generated from songbyrd_game_shows.csv. Shows hide themselves after their date. */
+const SHOWS = [
+ {
+  "date": "2026-11-12",
+  "name": "Teri Tobin's Home for the Holidays",
+  "with": "Imani-Grace Cooper",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/av8r77-teri-tobins-home-for-the-holidays-experience-dc-edition-12th-nov-songbyrd-washington-dc-tickets?dice_id=10857218&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1Xc1SktMTEw2NzA2MrOvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQANCXNTOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "soulful"
+  ],
+  "artist": "Teri Tobin",
+  "song": "Home for the Holidays",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-13",
+  "name": "Jimi Hendrix Birthday Bash w/ The Eli Cook Band",
+  "with": "On The Bus, Brassie",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/g5vr9a-jimi-hendrix-birthday-bash-w-the-eli-cook-band-on-the-bus-and-brassie-13th-nov-songbyrd-washington-dc-tickets?dice_id=10730663&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S9LNE01szA3SjM0S7KvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQDJMyDAOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "classic"
+  ],
+  "artist": "Jimi Hendrix",
+  "song": "Purple Haze",
+  "preview": "",
+  "start": 0,
+  "note": "Tribute night: The Eli Cook Band plays Hendrix"
+ },
+ {
+  "date": "2026-11-13",
+  "name": "AfroDesi DC ft. MR SAJ & Friends",
+  "with": "",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/xe86oa-afrodesi-dc-ft-mr-saj-friends-13th-nov-songbyrd-washington-dc-tickets?dice_id=10806709&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1Q%2ByTE5JTTI0MzAxM7evK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQD2fkeROwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "dance"
+  ],
+  "artist": "MR SAJ",
+  "song": "Afro Desi (Vol 1)",
+  "preview": "",
+  "start": 0,
+  "note": "Late-night DJ party, doors 11pm: Afrobeats, Amapiano, Desi"
+ },
+ {
+  "date": "2026-11-15",
+  "name": "Josie Edwards",
+  "with": "Hudson Ingram",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/92nqkn-josie-edwards-15th-nov-songbyrd-washington-dc-tickets?dice_id=10373597&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1Q81M0hKTDUxSjU3MLevK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQDca3u5OwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "folk"
+  ],
+  "artist": "Josie Edwards",
+  "song": "Hide Away",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-16",
+  "name": "P.E.E.",
+  "with": "gapyear, The Ritornello Form, Punxsutawny",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/8e77e2-pee-16th-nov-songbyrd-washington-dc-tickets?dice_id=10551187&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1U%2BzMDGwMDazMDWxMLOvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQAYg7hkOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "indie"
+  ],
+  "artist": "P.E.E.",
+  "song": "IHOP",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-17",
+  "name": "Twenty Years of We Are Scientists",
+  "with": "Sean McVerry",
+  "discount": false,
+  "link": "http://dice.fm/partner/tickets/event/8elqa2-twenty-years-of-we-are-scientists-celebrating-the-20th-anniversary-of-with-love-and-squalor-17th-nov-songbyrd-washington-dc-tickets?dice_id=9543948&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1fe0SLRMTEwzM7FINLGvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQARKARZOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "indie"
+  ],
+  "artist": "We Are Scientists",
+  "song": "Less From You",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-18",
+  "name": "Slap Dragon",
+  "with": "Gracie Jay",
+  "discount": true,
+  "link": "https://dice.fm/partner/tickets/event/l8m5bx-slap-dragon-18th-nov-songbyrd-washington-dc-tickets?dice_id=10491302&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S80sjBOTjJKMTJLNbCvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQDlNu9yOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "dance",
+   "soulful"
+  ],
+  "artist": "Slap Dragon",
+  "song": "Pool Song",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-19",
+  "name": "ViRG (Album Release)",
+  "with": "Anthony Pirog and Red Sunflower, Dumb Lucky",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/dkyrbq-virg-album-release-show-19th-nov-songbyrd-washington-dc-tickets?dice_id=10650804&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S8xSEpKSzVIMUhKTLWvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQA32qRtOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "dreamy"
+  ],
+  "artist": "ViRG",
+  "song": "Lost In You",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-20",
+  "name": "Kelsey Blackstone",
+  "with": "Josee Molavi, Playrite",
+  "discount": true,
+  "link": "https://dice.fm/partner/tickets/event/8edab2-kelsey-blackstone-20th-nov-songbyrd-washington-dc-tickets?dice_id=10623902&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1c%2B3NEo2MDOyTE40TbavK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQAcvk6GOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "soulful",
+   "indie"
+  ],
+  "artist": "Kelsey Blackstone",
+  "song": "Rinse and Repeat",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-21",
+  "name": "Dave Hause & The Mermaid",
+  "with": "Over Our Eyes",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/53lr8l-dave-hause-the-mermaid-21st-nov-songbyrd-washington-dc-tickets?dice_id=9164628&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1Xc0TklMSks2SzExSravK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQDyms0COwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "loud"
+  ],
+  "artist": "Dave Hause",
+  "song": "Mockingbird Blues",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-22",
+  "name": "James Ivy",
+  "with": "Harry Teardrop",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/py3g6p-james-ivy-22nd-nov-songbyrd-washington-dc-tickets?dice_id=10287820&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1Q%2BxNDJKNU9LM04yN7evK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQDVfwraOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "indie",
+   "dreamy"
+  ],
+  "artist": "James Ivy",
+  "song": "Lima",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-23",
+  "name": "Cortex",
+  "with": "",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/k62om9-cortex-23rd-nov-songbyrd-washington-dc-tickets?dice_id=10420392&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1c8xM0g0MEkzSjMyM7SvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQBp6yg9OwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "soulful"
+  ],
+  "artist": "Cortex",
+  "song": "nothing Changed",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-27",
+  "name": "Year of the Knife",
+  "with": "Gun to God's Head, Execute, Fade to Nothing/Faith in Destruction",
+  "discount": false,
+  "link": "https://dice.fm/event/g58b7p-year-of-the-knife-27th-nov-songbyrd-washington-dc-tickets?lng=en-US",
+  "tags": [
+   "loud"
+  ],
+  "artist": "Year of the Knife",
+  "song": "faith and dependence",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-11-28",
+  "name": "Night Train 357 w/ Dumi Right & Marc 2Ray",
+  "with": "",
+  "discount": true,
+  "link": "https://dice.fm/event/eo9dly-night-train-357-w-dumi-right-marc-2ray-28th-nov-songbyrd-washington-dc-tickets?lng=en-US",
+  "tags": [
+   "hiphop"
+  ],
+  "artist": "Night Train 357",
+  "song": "Make the Money",
+  "preview": "",
+  "start": 0,
+  "note": "All ages"
+ },
+ {
+  "date": "2026-12-01",
+  "name": "JEFF the Brotherhood",
+  "with": "",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/q23x9x-jeff-the-brotherhood-1st-dec-songbyrd-washington-dc-tickets?dice_id=10587070&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S%2B1NEgxMbC0sEgxTLOvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQCttGefOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "loud",
+   "indie"
+  ],
+  "artist": "JEFF the Brotherhood",
+  "song": "Mellow Out",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-12-02",
+  "name": "Tracey Nelson",
+  "with": "Oldstar",
+  "discount": false,
+  "link": "http://dice.fm/partner/tickets/event/eo9wr6-tracey-nelson-2nd-dec-songbyrd-washington-dc-tickets?dice_id=10762862&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S82MjM1NTVOTk1KNrevK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQBe%2BJ9TOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "folk"
+  ],
+  "artist": "Tracey Nelson",
+  "song": "Just Shoot Me Now",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-12-03",
+  "name": "Devon Gabriella",
+  "with": "",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/avk577-devon-gabriella-3rd-dec-songbyrd-washington-dc-tickets?dice_id=10518272&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1a9INDMwNjU3S0xNSbKvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQD%2BVaAPOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "indie",
+   "soulful"
+  ],
+  "artist": "Devon Gabriella",
+  "song": "Blood On Our Hands",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-12-04",
+  "name": "The Montaines",
+  "with": "Aidan LeClaire",
+  "discount": true,
+  "link": "https://dice.fm/partner/tickets/event/w83w2g-the-montaines-4th-dec-songbyrd-washington-dc-tickets?dice_id=10918937&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S9ONDU1MTE1TTRIMrCvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQAnsz7UOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "dance",
+   "indie"
+  ],
+  "artist": "The Montaines",
+  "song": "Normal People",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-12-05",
+  "name": "Eliza McLamb",
+  "with": "",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/92nw2n-eliza-mclamb-5th-dec-songbyrd-washington-dc-tickets?dice_id=10458129&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1Q%2BzTE01SDJNNrQwN7avK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQAGP%2F7JOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "indie",
+   "folk"
+  ],
+  "artist": "Eliza McLamb",
+  "song": "Mythologize Me",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-12-06",
+  "name": "Safety Bear",
+  "with": "Mx Mundy, Glorian",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/2wnpbp-safety-bear-w-mx-mundy-glorian-6th-dec-songbyrd-washington-dc-tickets?dice_id=10721048&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S83NktLS0xOSUpJNbCvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQBnz%2BgWOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "dance"
+  ],
+  "artist": "Safety Bear",
+  "song": "Ashamed",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-12-09",
+  "name": "Hope or Heartbreak ft. Kyaira & Gabrielle Hights",
+  "with": "Al Hostile",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/oemr3r-hope-or-heartbreak-ft-kyaira-gabrielle-hights-9th-dec-songbyrd-washington-dc-tickets?dice_id=10730534&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S9ONUw0NDCyMDY0MLOvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQAzEK%2BMOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "soulful"
+  ],
+  "artist": "Kyaira",
+  "song": "Noah",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-12-11",
+  "name": "Sunshine Benzi: Miss Bellum Tour",
+  "with": "",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/92nvnd-sunshine-benzi-miss-bellum-tour-11th-dec-songbyrd-washington-dc-tickets?dice_id=10587197&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1Y80MLUwSTMyN0ozsrCvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQD8oaoWOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "hiphop"
+  ],
+  "artist": "Sunshine Benzi",
+  "song": "Barracuda",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ },
+ {
+  "date": "2026-12-12",
+  "name": "Stout",
+  "with": "Maafa, Secret Society, The Screws, Balisong, Fade to Nothing",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/dk7dyq-stout-12th-dec-songbyrd-washington-dc-tickets?dice_id=10550194&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1Q9KNjRJSjRLTDMwSLavK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQAadG%2FVOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "loud"
+  ],
+  "artist": "Stout",
+  "song": "Knuckledragger",
+  "preview": "",
+  "start": 0,
+  "note": "Doors 6pm"
+ },
+ {
+  "date": "2026-12-13",
+  "name": "Eyehategod",
+  "with": "No/Más, Spiter",
+  "discount": false,
+  "link": "https://dice.fm/partner/tickets/event/m2bbxr-eyehategod-13th-dec-songbyrd-washington-dc-tickets?dice_id=10902207&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S9KTUwyMDM2SDFPNrCvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQDCO9PIOwAAAA%3D%3D&lng=en-US",
+  "tags": [
+   "loud"
+  ],
+  "artist": "Eyehategod",
+  "song": "New Orleans Is the New Vietnam",
+  "preview": "",
+  "start": 0,
+  "note": ""
+ }
+];
+
+/* Free / non-music nights for the "Also at Songbyrd" box. */
+const EXTRAS = [
+  {date:"2026-11-24", text:"Can I Kick It? (Shaolin Jazz screening), free"},
+  {date:"2026-11-30", text:"Songbyrd Music Trivia: Merry Thanxmas Edition, free"},
+  {date:"2026-12-08", text:"Trappers Delight Holiday Comedy Series"},
+];
+
+/* Reference songs used in the rounds: well-known tracks, grouped by vibe.
+   Edit freely. "start" (seconds) picks where inside Apple's 30-second preview the clip begins. */
+const VIBES = {
+  soulful:{label:"Soulful", songs:[["Olivia Dean","Dive"],["SZA","Snooze"],["Daniel Caesar","Get You"]]},
+  indie:{label:"Indie", songs:[["The Strokes","Reptilia"],["Arctic Monkeys","Do I Wanna Know?"],["Mitski","Washing Machine Heart"]]},
+  folk:{label:"Folk", songs:[["Noah Kahan","Stick Season"],["Phoebe Bridgers","Motion Sickness"],["Taylor Swift","cardigan"]]},
+  loud:{label:"Loud", songs:[["Turnstile","MYSTERY"],["Paramore","Misery Business"],["Deftones","Change (In the House of Flies)"]]},
+  dance:{label:"Dance", songs:[["Tyla","Water"],["Rema","Calm Down"],["Khruangbin","Time (You and I)"]]},
+  hiphop:{label:"Hip-hop", songs:[["Kendrick Lamar","Not Like Us"],["Tyler, The Creator","EARFQUAKE"],["A Tribe Called Quest","Can I Kick It?"]]},
+  dreamy:{label:"Dreamy", songs:[["Tame Impala","The Less I Know the Better"],["Cigarettes After Sex","Apocalypse"],["Lana Del Rey","Summertime Sadness"]]},
+  classic:{label:"Classic rock", songs:[["Jimi Hendrix","Purple Haze"],["Fleetwood Mac","Dreams"],["Janis Joplin","Piece of My Heart"]]},
+};
+
+/* ===================== HELPERS ===================== */
+const $ = id => document.getElementById(id);
+const params = new URLSearchParams(location.search);
+const SOURCE = params.get("src") || "direct";             // e.g. ?src=flyer_gw  ?src=creator  ?src=wrgw
+const TODAY = params.get("today") || new Date().toLocaleDateString("en-CA"); // test with ?today=2026-11-20
+const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
+const fmtDate = d => new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function log(event, data={}){
+  if(!LOG_ENDPOINT) return;
+  try{
+    fetch(LOG_ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},
+      body:JSON.stringify({event, ts:new Date().toISOString(), school:state.school, source:SOURCE, ...data})});
+  }catch(e){}
+}
+
+/* Apple Music preview lookup (JSONP, works from GitHub Pages or a local file). */
+const cache = {};
+let cbN = 0;
+function lookup(artist, song){
+  const key = (artist+"|"+song).toLowerCase();
+  if(cache[key]) return cache[key];
+  cache[key] = new Promise(resolve=>{
+    const name = "itcb"+(cbN++);
+    const s = document.createElement("script");
+    const done = v => { resolve(v); delete window[name]; s.remove(); };
+    const timer = setTimeout(()=>done(null), 6000);
+    window[name] = data => {
+      clearTimeout(timer);
+      const res = (data && data.results) || [];
+      const a = artist.toLowerCase();
+      const hit = res.find(r=>r.previewUrl && r.artistName && r.artistName.toLowerCase().includes(a)) || null;
+      done(hit ? {url:hit.previewUrl, link:hit.trackViewUrl, title:hit.trackName, artist:hit.artistName} : null);
+    };
+    s.onerror = ()=>{ clearTimeout(timer); done(null); };
+    s.src = "https://itunes.apple.com/search?entity=song&limit=10&callback="+name+"&term="+encodeURIComponent((artist+" "+song).trim());
+    document.head.appendChild(s);
+  });
+  return cache[key];
+}
+
+/* Audio player: one clip at a time. */
+const player = new Audio();
+let stopTimer = null, playingCard = null;
+function stopAudio(){ player.pause(); clearTimeout(stopTimer); if(playingCard) playingCard.classList.remove("playing"); playingCard=null; }
+async function playClip(card, track, start=0){
+  stopAudio();
+  if(!track){ return false; }
+  player.src = track.url; player.currentTime = start;
+  try{ await player.play(); }catch(e){ return false; }
+  playingCard = card; if(card) card.classList.add("playing");
+  stopTimer = setTimeout(stopAudio, CLIP_SECONDS*1000);
+  return true;
+}
+player.addEventListener("ended", stopAudio);
+
+/* ===================== GAME ===================== */
+const state = {school:"", round:0, pairs:[], scores:{}, picks:[], heard:{A:false,B:false}};
+
+function buildPairs(){
+  // Each vibe appears twice (two different songs); every round pits two different vibes.
+  const tags = Object.keys(VIBES);
+  const songPool = {}; tags.forEach(t=>songPool[t]=shuffle(VIBES[t].songs.map(([artist,song,start])=>({artist,song,start:start||0,tag:t}))));
+  const pairs = [];
+  for(let pass=0; pass<2; pass++){
+    const order = shuffle(tags);
+    for(let i=0;i+1<order.length;i+=2) pairs.push([songPool[order[i]].pop(), songPool[order[i+1]].pop()]);
+  }
+  return pairs.slice(0, ROUNDS);
+}
+
+function setBird(mood){ const b=$("bird"); b.classList.remove("happy","wow","meh"); if(mood) b.classList.add(mood); }
+
+function renderProgress(){
+  $("progress").innerHTML = Array.from({length:ROUNDS},(_,i)=>`<span class="${i<state.round?'done':i===state.round?'now':''}"></span>`).join("");
+}
+
+async function showRound(){
+  stopAudio();
+  renderProgress();
+  const [a,b] = state.pairs[state.round];
+  state.heard = {A:false,B:false};
+  $("hintA").textContent = "Tap to play"; $("hintB").textContent = "Tap to play";
+  $("bubble").textContent = state.round===0 ? "Round 1. Tap A, then B." : `Round ${state.round+1} of ${ROUNDS}.`;
+  // look up both clips now so taps feel instant
+  a.trackP = lookup(a.artist, a.song); b.trackP = lookup(b.artist, b.song);
+  // pre-fetch next round
+  const nxt = state.pairs[state.round+1]; if(nxt){ lookup(nxt[0].artist,nxt[0].song); lookup(nxt[1].artist,nxt[1].song); }
+}
+
+async function tapCard(which){
+  const item = state.pairs[state.round][which==="A"?0:1];
+  const card = $(which==="A"?"cardA":"cardB"), hint = $(which==="A"?"hintA":"hintB");
+  if(playingCard===card){ stopAudio(); hint.textContent="Tap to replay"; return; }
+  hint.textContent = "Loading…";
+  const track = await item.trackP;
+  const ok = await playClip(card, track, item.start);
+  if(ok){ hint.textContent = "Playing"; }
+  else { hint.innerHTML = `<span class="unavailable">Clip unavailable:<br><b>${esc(item.song)}</b><br>${esc(item.artist)}</span>`; }
+  state.heard[which] = true;
+}
+
+function pick(choice){
+  stopAudio();
+  const [a,b] = state.pairs[state.round];
+  let msg;
+  if(choice==="N"){
+    setBird("meh");
+    msg = `Neither. Fair. That was <b>${esc(a.song)}</b> by ${esc(a.artist)} vs <b>${esc(b.song)}</b> by ${esc(b.artist)}.`;
+  } else {
+    const win = choice==="A"?a:b, lose = choice==="A"?b:a;
+    state.scores[win.tag] = (state.scores[win.tag]||0) + 1;
+    setBird(state.round%2 ? "wow" : "happy");
+    msg = `You picked <b>${esc(win.song)}</b> by ${esc(win.artist)} over ${esc(lose.song)} by ${esc(lose.artist)}.`;
+  }
+  state.picks.push({a:a.artist+" - "+a.song, b:b.artist+" - "+b.song, choice});
+  $("reveal").innerHTML = msg;
+  state.round++;
+  if(state.round >= state.pairs.length){ setTimeout(showResult, 900); }
+  else { showRound(); }
+}
+
+/* Matching: shows score by how much of your mix their vibes cover. Ties go to student-discount shows, then sooner shows. */
+function rankShows(){
+  const total = Object.values(state.scores).reduce((s,v)=>s+v,0) || 1;
+  const share = t => (state.scores[t]||0)/total;
+  const upcoming = SHOWS.filter(s=>s.date >= TODAY && s.tags.length);
+  const scored = upcoming.map(s=>{
+    const vals = s.tags.map(share).sort((x,y)=>y-x);
+    const fit = (vals[0]||0) + 0.5*(vals[1]||0);
+    const days = (new Date(s.date) - new Date(TODAY))/864e5;
+    return {...s, fit, rank: fit + (s.discount?0.04:0) - days*0.0005};
+  }).sort((x,y)=>y.rank-x.rank);
+  const best = scored[0] ? scored[0].fit : 1;
+  scored.forEach(s=>s.pct = Math.round(70 + 29*(best ? s.fit/best : 0)) - (s===scored[0]?0:Math.round(Math.random()*3)));
+  return scored;
+}
+
+function mixRows(){
+  const total = Object.values(state.scores).reduce((s,v)=>s+v,0);
+  if(!total) return [];
+  return Object.entries(state.scores).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([t,v])=>({label:VIBES[t].label, pct:Math.round(100*v/total)}));
+}
+
+let result = null;
+async function showResult(){
+  $("s-round").hidden = true; $("s-result").hidden = false; window.scrollTo(0,0);
+  const ranked = rankShows();
+  const top = ranked[0];
+  const mix = mixRows();
+  result = {top, mix};
+  if(!top){ $("stub").innerHTML = `<div class="main"><p>No upcoming shows right now. Check songbyrddc.com for new dates.</p></div>`; return; }
+  $("stub").innerHTML = `
+    <div class="main">
+      <span class="eyebrow">Admit one · ${esc(state.school || "Songbyrd fan")}</span>
+      <span class="eyebrow">Your Songbyrd match · ${top.pct}%</span>
+      <div class="showname">${esc(top.name)}</div>
+      <div class="meta">${fmtDate(top.date)} · Songbyrd, 540 Penn St NE${top.with?`<br>with ${esc(top.with)}`:""}${top.note?`<br><i>${esc(top.note)}</i>`:""}</div>
+      ${top.discount?`<span class="stamp">$5 off with student ID</span>`:""}
+      <div class="mix">${mix.map(m=>`<div class="mixrow"><span>${m.label}</span><span class="mixbar"><i style="width:${m.pct}%"></i></span><span class="pct">${m.pct}%</span></div>`).join("") || `<p class="meta">You skipped every round, so here's the next show we think you'd like.</p>`}</div>
+      <div class="actions">
+        <button class="btn" id="hear" style="background:var(--teal)">▶ Hear ${esc(top.artist)}</button>
+        <a class="btn" id="tix" href="${esc(top.link)}" target="_blank" rel="noopener">Get tickets</a>
+      </div>
+      <span class="applelink" id="apple"></span>
+    </div>
+    <div class="perf"></div>
+    <div class="tear"><span>SONGBYRD MUSIC HOUSE</span><span>№ ${String(Math.floor(Math.random()*9000)+1000)}</span></div>`;
+  $("tix").addEventListener("click",()=>log("tickets_click",{show:top.name, slot:"match"}));
+  $("hear").addEventListener("click", async ()=>{
+    const t = top.preview ? {url:top.preview} : await lookup(top.artist, top.song);
+    const ok = await playClip(null, t, top.start||0);
+    if(!ok) $("apple").textContent = `Couldn't load a clip for ${top.artist}. Look up "${top.song}" on your music app.`;
+    else if(t.link) $("apple").innerHTML = `<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:inherit">Listen on Apple Music</a>`;
+  });
+  $("runners").innerHTML = ranked.slice(1,3).map((s,i)=>`
+    <div class="runner"><div><div class="n">${esc(s.name)}</div><div class="meta">${fmtDate(s.date)}${s.discount?" · $5 off w/ student ID":""}</div></div>
+    <a href="${esc(s.link)}" target="_blank" rel="noopener" data-show="${esc(s.name)}">Tickets →</a></div>`).join("");
+  $("runners").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>log("tickets_click",{show:a.dataset.show, slot:"runner"})));
+  const extras = EXTRAS.filter(e=>e.date>=TODAY);
+  $("also").innerHTML = extras.length ? `<b class="eyebrow">Also at Songbyrd</b>${extras.map(e=>`<span>${fmtDate(e.date)}: ${esc(e.text)}</span>`).join("")}` : "";
+  $("also").hidden = !extras.length;
+  log("finish",{match:top.name, mix:mix.map(m=>m.label+" "+m.pct+"%").join(", "), picks:JSON.stringify(state.picks)});
+}
+
+/* Share card: a 1080x1920 ticket image for Instagram Stories. ASSET: draw your own background and set it here. */
+function drawCard(){
+  const {top, mix} = result; const c = document.createElement("canvas"); c.width=1080; c.height=1920; const g=c.getContext("2d");
+  g.fillStyle="#E0494F"; g.fillRect(0,0,1080,1920);
+  g.fillStyle="#F5EE5A"; g.font="700 92px 'Space Mono', monospace"; g.fillText("My Songbyrd", 80, 230); g.fillText("show is…", 80, 340);
+  // stub
+  g.fillStyle="#26295E"; g.fillRect(92,452,912,1100);
+  g.fillStyle="#FBF6E9"; g.fillRect(80,440,912,1100);
+  g.strokeStyle="#26295E"; g.lineWidth=8; g.strokeRect(80,440,912,1100);
+  g.fillStyle="#26295E"; g.font="400 34px 'Space Mono', monospace";
+  g.fillText(("ADMIT ONE · "+(state.school||"SONGBYRD FAN")).toUpperCase().slice(0,40), 130, 520);
+  g.fillText(`YOUR MATCH · ${top.pct}%`, 130, 575);
+  g.font="700 76px 'Space Mono', monospace";
+  wrap(g, top.name, 130, 690, 820, 86, 4);
+  g.font="400 40px 'Didact Gothic', sans-serif";
+  g.fillText(fmtDate(top.date)+" · Songbyrd DC", 130, 1060);
+  if(top.discount){ g.save(); g.translate(130,1150); g.rotate(-0.06); g.strokeStyle="#3E9A57"; g.lineWidth=6; g.strokeRect(0,-50,520,70); g.fillStyle="#3E9A57"; g.font="700 34px 'Space Mono', monospace"; g.fillText("$5 OFF WITH STUDENT ID",18,-3); g.restore(); }
+  let y=1260; g.font="400 34px 'Didact Gothic', sans-serif";
+  mix.forEach(m=>{ g.fillStyle="#26295E"; g.fillText(m.label, 130, y); g.strokeRect(400,y-30,420,34); g.fillStyle="#E0494F"; g.fillRect(404,y-26,412*m.pct/100,26); g.fillStyle="#26295E"; g.fillText(m.pct+"%",850,y); y+=70; });
+  g.setLineDash([22,18]); g.beginPath(); g.moveTo(110,1450); g.lineTo(962,1450); g.stroke(); g.setLineDash([]);
+  g.font="700 34px 'Space Mono', monospace"; g.fillText("SONGBYRD MUSIC HOUSE · 540 PENN ST NE", 130, 1510);
+  g.fillStyle="#F5EE5A"; g.font="700 46px 'Space Mono', monospace"; g.fillText("Find yours →", 80, 1720);
+  g.font="400 36px 'Space Mono', monospace"; g.fillText("link in bio / scan the flyer", 80, 1785);
+  return c;
+}
+function wrap(g, text, x, y, maxW, lh, maxLines){
+  const words = text.split(" "); let line="", lines=0;
+  for(const w of words){ const t=line?line+" "+w:w; if(g.measureText(t).width>maxW && line){ g.fillText(line,x,y); y+=lh; line=w; if(++lines>=maxLines-1) break; } else line=t; }
+  if(line) g.fillText(line,x,y);
+}
+async function shareCard(){
+  const c = drawCard();
+  log("share_click",{show:result.top.name});
+  c.toBlob(async blob=>{
+    const file = new File([blob],"my-songbyrd-ticket.png",{type:"image/png"});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{ await navigator.share({files:[file], title:"My Songbyrd show"}); return; }catch(e){ /* cancelled */ }
+    }
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "my-songbyrd-ticket.png"; a.click();
+  },"image/png");
+}
+
+/* ===================== WIRING ===================== */
+$("go").addEventListener("click",()=>{
+  state.school = $("school").value; state.round=0; state.scores={}; state.picks=[];
+  state.pairs = buildPairs();
+  $("s-start").hidden = true; $("s-round").hidden = false; $("reveal").textContent="Your picks show up here.";
+  log("start"); showRound();
+});
+["A","B"].forEach(w=>{
+  const card = $("card"+w);
+  card.addEventListener("click",()=>tapCard(w));
+  card.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); tapCard(w); } });
+});
+$("pickA").addEventListener("click",()=>pick("A"));
+$("pickB").addEventListener("click",()=>pick("B"));
+$("pickN").addEventListener("click",()=>pick("N"));
+$("share").addEventListener("click",shareCard);
+$("again").addEventListener("click",()=>{ stopAudio(); $("s-result").hidden=true; $("s-start").hidden=false; window.scrollTo(0,0); });
+$("emailGo").addEventListener("click",()=>{
+  const v=$("email").value.trim();
+  if(!/^\S+@\S+\.\S+$/.test(v)){ $("emailMsg").textContent="That email doesn't look right. Check for typos."; return; }
+  if(!$("consent").checked){ $("emailMsg").textContent="Tick the box so Songbyrd is allowed to email you."; return; }
+  log("email",{email:v, show:result && result.top ? result.top.name : ""});
+  $("emailMsg").textContent = "You're on the list. See you at Songbyrd.";
+  $("emailGo").disabled = true;
+});
+</script>
+</body>
+</html>
