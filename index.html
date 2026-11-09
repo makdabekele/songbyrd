@@ -5,121 +5,151 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Find Your Songbyrd Show</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo:wght@500;600;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Archivo:wght@500;700;800&display=swap">
 <style>
 /* ================= CUSTOMIZE: COLORS & FONTS =================
-   Change any hex value below and the whole game updates.        */
+   Songbyrd brand colors (from the logo files). Change a hex value and the whole game updates. */
 :root{
-  --bg:#D9454B;        /* page background (red) */
-  --bg-dark:#B8343A;   /* texture dots + shadows on red */
-  --ink:#1F2252;       /* outlines and main text */
-  --paper:#FFF8E7;     /* panels, ticket */
-  --yellow:#F7EE5B;    /* card A, buttons */
-  --teal:#86CAD9;      /* card B */
-  --green:#2E8A4B;     /* $5 stamp */
-  --display:"Space Mono", ui-monospace, Menlo, monospace;
+  --navy:#1D2D5D; --coral:#EF3C49; --blue:#0677BD; --yellow:#FFF341; --green:#1BA95F; --mint:#61C8D7; --paper:#FFF8EC;
+  --off:5px;                                    /* every offset shadow uses this size */
+  --title:"Archivo Black", "Arial Black", Impact, sans-serif;
+  --mono:"Space Mono", ui-monospace, Menlo, monospace;
   --body:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  /* screen colors, swapped by phase (see body classes below) */
+  --bg:var(--navy); --cardA:var(--yellow); --cardAtext:var(--navy); --cardB:var(--coral); --cardBtext:var(--yellow);
   color-scheme:light;
 }
+body.known{--bg:var(--green); --cardA:var(--yellow); --cardAtext:var(--navy); --cardB:var(--coral); --cardBtext:var(--yellow)}
+body.local{--bg:var(--coral)}
+body.local.v1{--cardA:var(--blue); --cardAtext:var(--yellow); --cardB:var(--yellow); --cardBtext:var(--navy)}
+body.local.v2{--cardA:var(--yellow); --cardAtext:var(--navy); --cardB:var(--green); --cardBtext:var(--yellow)}
+body.local.v3{--cardA:var(--green); --cardAtext:var(--yellow); --cardB:var(--blue); --cardBtext:var(--yellow)}
+
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;min-height:100%}
-body{
-  background-color:var(--bg);
-  background-image:radial-gradient(var(--bg-dark) 1.2px, transparent 1.3px);
-  background-size:14px 14px;
-  color:var(--ink);font-family:var(--body);font-weight:500;font-size:17px;line-height:1.45;
-  padding:max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
-}
+body{background:var(--bg);transition:background .35s ease;color:var(--navy);font-family:var(--body);font-weight:500;font-size:17px;line-height:1.45;
+  padding:max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left))}
 .app{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-.top{display:flex;justify-content:space-between;font-family:var(--display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--paper)}
-h1{font-family:var(--display);font-weight:700;font-size:42px;line-height:1;margin:0;color:var(--yellow);text-shadow:3px 3px 0 var(--ink);text-wrap:balance}
 p{margin:0}
-.panel{background:var(--paper);border:3px solid var(--ink);border-radius:8px;box-shadow:5px 5px 0 var(--ink);padding:16px}
-.btn{font-family:var(--display);font-weight:700;font-size:17px;border:3px solid var(--ink);border-radius:6px;background:var(--yellow);color:var(--ink);
-  padding:14px 16px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);text-decoration:none;display:inline-block;text-align:center}
-.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
-.btn.teal{background:var(--teal)}
-.btn.big{font-size:20px;padding:16px}
-.link{background:none;border:0;font-family:var(--display);font-size:15px;color:var(--paper);text-decoration:underline;cursor:pointer;padding:6px;align-self:center}
-.btn:focus-visible,.link:focus-visible,select:focus-visible,input:focus-visible,.card:focus-visible,summary:focus-visible{outline:3px dashed var(--yellow);outline-offset:3px}
+.topbar{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--yellow)}
+.topbar a{color:var(--yellow)}
 .screen{display:flex;flex-direction:column;gap:20px}
-label.cap{font-family:var(--display);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
-select,input[type=email]{width:100%;font:inherit;padding:12px;border:3px solid var(--ink);border-radius:6px;background:#fff;color:var(--ink)}
+.slide{transition:text-shadow .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s cubic-bezier(.2,.8,.2,1)}
+:focus-visible{outline:3px dashed var(--yellow);outline-offset:3px}
+
+/* Start screen = the Byrdland storefront: stripes, coral, light blue */
+body.start{background:
+  linear-gradient(112deg, transparent 0 26%, var(--coral) 26% 63%, var(--mint) 63%),
+  repeating-linear-gradient(135deg,#111 0 10px,#fff 10px 20px)}
+body.start .topbar{background:var(--navy);padding:8px 10px;align-self:stretch}
+.mural{padding:18px 0 6px}
+h1{font-family:var(--title);font-weight:400;font-size:clamp(34px,10vw,48px);line-height:.95;margin:0;text-transform:uppercase;
+  color:var(--yellow);overflow-wrap:anywhere;
+  text-shadow:0 0 0 var(--blue), 0 2px 14px rgba(17,17,17,.55), 0 0 3px rgba(17,17,17,.45)}
+h1:hover{text-shadow:var(--off) var(--off) 0 var(--blue), 0 2px 14px rgba(17,17,17,.55), 0 0 3px rgba(17,17,17,.45)}
+@media (hover:none){ h1{text-shadow:var(--off) var(--off) 0 var(--blue), 0 2px 14px rgba(17,17,17,.55), 0 0 3px rgba(17,17,17,.45)} }
+.lede{color:var(--paper);font-size:17px}
+
+/* Buttons: flat color, shadow slides out on hover */
+.btn{font-family:var(--title);font-weight:400;font-size:19px;text-transform:uppercase;border:0;border-radius:0;background:var(--yellow);color:var(--navy);
+  padding:14px 18px;cursor:pointer;box-shadow:0 0 0 var(--blue);text-decoration:none;display:inline-block;text-align:center}
+.btn:hover{box-shadow:var(--off) var(--off) 0 var(--blue)}
+.btn:active{box-shadow:2px 2px 0 var(--blue)}
+.btn.alt{background:var(--paper)}
+.link{background:none;border:0;font-family:var(--mono);font-size:15px;color:var(--paper);text-decoration:underline;cursor:pointer;padding:6px;align-self:center}
+
+/* Cream panels: outlined, with an offset */
+.panel{background:var(--paper);border:3px solid var(--navy);border-radius:0;box-shadow:var(--off) var(--off) 0 var(--navy);padding:16px}
+label.cap{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+select,input[type=email]{width:100%;font:inherit;padding:12px;border:3px solid var(--navy);border-radius:0;background:#fff;color:var(--navy)}
 .field{display:flex;flex-direction:column;gap:8px}
 
-/* Bird: replace with your drawing by setting ASSETS.bird in the script */
+/* Bird (replace with drawings via ASSETS in the script) */
 .birdrow{display:flex;align-items:center;gap:12px}
-.bird{width:70px;height:70px;flex:none;transition:transform .25s;object-fit:contain}
+.bird{width:66px;height:66px;flex:none;transition:transform .25s;object-fit:contain}
 .bird.happy{transform:rotate(-10deg) scale(1.08)}.bird.wow{transform:translateY(-8px) scale(1.12)}.bird.meh{transform:rotate(8deg) scale(.95)}
-.bubble{background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:10px 14px;font-family:var(--display);font-size:15px;box-shadow:3px 3px 0 var(--ink)}
+.bubble{background:var(--paper);border:3px solid var(--navy);box-shadow:var(--off) var(--off) 0 var(--navy);padding:9px 12px;font-family:var(--mono);font-size:14px}
 
-.progress{display:flex;gap:6px}
-.progress span{flex:1;height:12px;border:2px solid var(--ink);background:var(--paper);border-radius:3px}
-.progress span.done{background:var(--yellow)}.progress span.now{background:var(--teal)}
-.progress span.local{border-style:dashed}
+.progress{display:flex;gap:5px}
+.progress span{flex:1;height:10px;background:var(--paper);transition:background .35s}
+.progress span.done{background:var(--navy)}
 
+/* Cards with tonearm */
 .vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.card{border:3px solid var(--ink);border-radius:8px;padding:14px 10px;display:flex;flex-direction:column;gap:10px;align-items:center;
-  box-shadow:6px 6px 0 var(--ink);cursor:pointer;min-width:0;text-align:center;transition:transform .15s}
-.card.a{background:var(--yellow);transform:rotate(-1.2deg)}.card.b{background:var(--teal);transform:rotate(1.2deg)}
-.card.chosen{outline:4px solid var(--paper);outline-offset:3px}
-.card .letter{font-family:var(--display);font-weight:700;font-size:30px;line-height:1}
-.record{width:100%;max-width:140px;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#1b1d47 0 3px,#2b2f68 3px 5px);display:grid;place-items:center;background-size:cover}
-.record::after{content:"";width:34%;aspect-ratio:1;border-radius:50%;background:var(--paper);border:3px solid var(--ink)}
+.card{border:3px solid var(--navy);border-radius:0;padding:12px 8px 14px;display:flex;flex-direction:column;gap:8px;align-items:center;
+  box-shadow:var(--off) var(--off) 0 var(--navy);cursor:pointer;min-width:0;text-align:center;transition:background .35s}
+.card.a{background:var(--cardA)}.card.b{background:var(--cardB)}
+.card.a .letter{color:var(--cardAtext)}.card.b .letter{color:var(--cardBtext)}
+.card.chosen{box-shadow:var(--off) var(--off) 0 var(--navy), 0 0 0 4px var(--paper)}
+.letter{font-family:var(--title);font-size:28px;line-height:1}
+.deck{position:relative;width:100%;max-width:140px;aspect-ratio:1}
+.record{position:absolute;inset:6% 12% 6% 0;border-radius:50%;background:repeating-radial-gradient(circle,#141f45 0 3px,#26386f 3px 5px);background-size:cover;display:grid;place-items:center}
+.record::after{content:"";width:34%;aspect-ratio:1;border-radius:50%;background:var(--yellow);border:3px solid var(--navy)}
 .card.playing .record{animation:spin 1.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.hint{font-family:var(--display);font-size:13px;font-weight:700;text-transform:uppercase;background:var(--paper);border:2px solid var(--ink);border-radius:20px;padding:4px 10px}
-.tag{font-family:var(--display);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.arm{position:absolute;right:0;top:0;width:44%;height:86%;transform-origin:78% 10%;transform:rotate(-28deg);transition:transform .55s cubic-bezier(.3,1.5,.5,1)}
+.card.playing .arm{transform:rotate(4deg)}
+.arm svg,.arm img{width:100%;height:100%;overflow:visible;object-fit:contain}
+.hint{font-family:var(--mono);font-size:12px;font-weight:700;text-transform:uppercase;background:var(--paper);padding:4px 10px}
 .picks{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.reveal{font-size:16px;min-height:56px}
-.reveal b{font-weight:800}
-.reveal .local{display:inline-block;margin-top:4px;font-family:var(--display);font-size:12px;text-transform:uppercase;background:var(--yellow);border:2px solid var(--ink);padding:2px 6px}
+.pick.a{background:var(--cardA);color:var(--cardAtext)}.pick.b{background:var(--cardB);color:var(--cardBtext)}
 
-/* RESULT */
-.hero{background:var(--paper);border:4px solid var(--ink);border-radius:10px;box-shadow:8px 8px 0 var(--ink);position:relative;overflow:hidden}
-.hero .band{background:var(--ink);color:var(--yellow);font-family:var(--display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:10px 18px;display:flex;justify-content:space-between}
+/* Reveal with color-matched names and tickets */
+.reveal{display:flex;flex-direction:column;gap:12px;font-size:16px;min-height:60px}
+.pill{font-weight:800;padding:1px 6px;white-space:nowrap}
+.pill.a{background:var(--pa);color:var(--pat)}.pill.b{background:var(--pb);color:var(--pbt)}
+.tixrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tix{font-family:var(--mono);font-weight:700;font-size:13px;text-decoration:none;border:3px solid var(--navy);padding:9px;
+  display:flex;flex-direction:column;gap:2px;min-width:0;box-shadow:0 0 0 var(--navy)}
+.tix:hover{box-shadow:var(--off) var(--off) 0 var(--navy)}
+.tix.a{background:var(--pa);color:var(--pat)}.tix.b{background:var(--pb);color:var(--pbt)}
+.tix small{font-family:var(--body);font-weight:700;font-size:12px}
+
+/* Result ticket */
+.hero{background:var(--paper);border:3px solid var(--navy);box-shadow:var(--off) var(--off) 0 var(--navy)}
+.hero .band{background:var(--navy);color:var(--yellow);font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:10px 18px;display:flex;justify-content:space-between}
 .hero .body{padding:20px 18px;display:flex;flex-direction:column;gap:14px}
-.showname{font-family:var(--display);font-weight:700;font-size:38px;line-height:1.02;text-wrap:balance;word-break:break-word}
-.when{font-family:var(--display);font-size:20px;font-weight:700}
+.showname{font-family:var(--title);font-size:36px;line-height:1;text-transform:uppercase;text-wrap:balance;overflow-wrap:anywhere}
+.when{font-family:var(--mono);font-size:19px;font-weight:700}
+.where a{color:var(--navy);font-weight:700}
 .with{font-size:16px}
 .note{font-size:15px;font-style:italic}
-.stamp{align-self:flex-start;font-family:var(--display);font-weight:700;font-size:15px;color:var(--green);border:3px solid var(--green);padding:6px 10px;transform:rotate(-3deg);text-transform:uppercase;background:#fff}
-.why{font-size:16px;border-left:4px solid var(--bg);padding-left:10px}
+.stamp{align-self:flex-start;font-family:var(--mono);font-weight:700;font-size:15px;color:#fff;background:var(--green);padding:6px 10px;transform:rotate(-3deg);text-transform:uppercase}
+.why{font-size:16px;border-left:4px solid var(--coral);padding-left:10px}
 .cta{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.hero .perf{border-top:3px dashed var(--ink);margin:0 14px}
-.hero .stubfoot{padding:12px 18px;font-family:var(--display);font-size:12px;display:flex;justify-content:space-between}
+.hero .perf{border-top:3px dashed var(--navy);margin:0 14px}
+.hero .stubfoot{padding:12px 18px;font-family:var(--mono);font-size:12px;display:flex;justify-content:space-between;gap:10px}
 .applelink{font-size:14px}
-details{background:var(--paper);border:3px solid var(--ink);border-radius:8px;box-shadow:4px 4px 0 var(--ink)}
-summary{cursor:pointer;padding:14px 16px;font-family:var(--display);font-weight:700;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+details{background:var(--paper);border:3px solid var(--navy);box-shadow:var(--off) var(--off) 0 var(--navy)}
+summary{cursor:pointer;padding:14px 16px;font-family:var(--mono);font-weight:700;font-size:15px;list-style:none;display:flex;justify-content:space-between}
 summary::after{content:"+";font-size:20px;line-height:1}
 details[open] summary::after{content:"–"}
 .mix{display:flex;flex-direction:column;gap:8px;padding:0 16px 16px}
 .mixrow{display:grid;grid-template-columns:96px 1fr 44px;gap:8px;align-items:center;font-size:15px}
-.mixbar{height:14px;border:2px solid var(--ink);background:#fff;border-radius:3px;overflow:hidden}
-.mixbar i{display:block;height:100%;background:var(--bg)}
-.mixrow .pct{font-family:var(--display);font-variant-numeric:tabular-nums;text-align:right}
-.sectionlabel{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--paper)}
+.mixbar{height:14px;background:#fff;border:2px solid var(--navy)}
+.mixbar i{display:block;height:100%;background:var(--coral)}
+.mixrow .pct{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.sectionlabel{font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow)}
 .runner{display:flex;justify-content:space-between;gap:12px;align-items:center}
-.runner .n{font-family:var(--display);font-weight:700;font-size:16px}
-.runner a{font-family:var(--display);font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap}
-.also{background:var(--teal)}
+.runner .n{font-family:var(--title);font-size:16px;text-transform:uppercase}
+.runner a{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--navy);white-space:nowrap}
+.also{background:var(--yellow)}
 .also ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
 .check{display:flex;gap:8px;align-items:flex-start;font-size:14px}
 .small{font-size:14px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
-<body>
+<body class="start">
 <main class="app">
-  <div class="top"><span>Songbyrd Music House</span><span>540 Penn St NE</span></div>
+  <div class="topbar"><span>Songbyrd Music House</span><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Songbyrd+Music+House%2C+540+Penn+St+NE%2C+Washington%2C+DC+20002" target="_blank" rel="noopener">540 Penn St NE ↗</a></div>
 
   <section class="screen" id="s-start">
-    <h1>Find Your Songbyrd Show</h1>
-    <div class="birdrow"><span class="birdslot" data-mood=""></span>
-      <div class="bubble">8 rounds of this or that. Headphones on.</div></div>
+    <div class="mural"><h1 class="slide">Find your Songbyrd show</h1></div>
+    <div class="birdrow"><span class="birdslot" data-mood=""></span><div class="bubble">Headphones on.</div></div>
     <div class="panel" style="display:flex;flex-direction:column;gap:14px">
-      <p>Pick the song you'd rather hear. The first half is songs you know. The second half is artists playing Songbyrd this semester. We'll match you to a show.</p>
+      <p>8 rounds of this or that. The first half is songs you know. The second half is artists playing Songbyrd this semester. We'll match you to a show.</p>
       <div class="field">
         <label class="cap" for="school">Where do you go?</label>
         <select id="school">
@@ -129,7 +159,7 @@ details[open] summary::after{content:"–"}
           <option>University of Maryland</option><option>Other school</option><option>Not a student</option>
         </select>
       </div>
-      <button class="btn big" id="go">Start</button>
+      <button class="btn slide" id="go">Start</button>
     </div>
   </section>
 
@@ -138,15 +168,15 @@ details[open] summary::after{content:"–"}
     <div class="birdrow"><span class="birdslot" id="roundBird"></span><div class="bubble" id="bubble">Round 1</div></div>
     <div class="vs">
       <div class="card a" id="cardA" tabindex="0" role="button" aria-label="Play song A">
-        <span class="letter">A</span><div class="record"></div><span class="hint" id="hintA">▶ Play</span><span class="tag" id="tagA"></span>
+        <span class="letter">A</span><div class="deck"><div class="record"></div><div class="arm"></div></div><span class="hint" id="hintA">▶ Play</span>
       </div>
       <div class="card b" id="cardB" tabindex="0" role="button" aria-label="Play song B">
-        <span class="letter">B</span><div class="record"></div><span class="hint" id="hintB">▶ Play</span><span class="tag" id="tagB"></span>
+        <span class="letter">B</span><div class="deck"><div class="record"></div><div class="arm"></div></div><span class="hint" id="hintB">▶ Play</span>
       </div>
     </div>
     <div class="picks">
-      <button class="btn big" id="pickA">Pick A</button>
-      <button class="btn big teal" id="pickB">Pick B</button>
+      <button class="btn slide pick a" id="pickA">Pick A</button>
+      <button class="btn slide pick b" id="pickB">Pick B</button>
     </div>
     <button class="link" id="pickN">Neither for me</button>
     <div class="panel reveal" id="reveal" aria-live="polite">Listen to both, then pick one.</div>
@@ -156,8 +186,8 @@ details[open] summary::after{content:"–"}
     <div class="birdrow"><span class="birdslot" data-mood="wow"></span><div class="bubble">Your ticket's ready.</div></div>
     <div class="hero" id="hero"></div>
     <div class="cta">
-      <button class="btn" id="share">Save my ticket</button>
-      <button class="btn teal" id="again">Play again</button>
+      <button class="btn slide" id="share">Save my ticket</button>
+      <button class="btn slide alt" id="again">Play again</button>
     </div>
     <details id="stats"><summary>See your taste breakdown</summary><div class="mix" id="mix"></div></details>
     <div class="sectionlabel">Two more you might like</div>
@@ -167,7 +197,7 @@ details[open] summary::after{content:"–"}
       <label class="cap" for="email">Want a reminder before your show?</label>
       <input type="email" id="email" placeholder="you@school.edu" autocomplete="email">
       <label class="check" for="consent"><input type="checkbox" id="consent"> <span>Songbyrd can email me about upcoming shows. Unsubscribe anytime.</span></label>
-      <button class="btn" id="emailGo">Send it</button>
+      <button class="btn slide" id="emailGo">Send it</button>
       <p class="small" id="emailMsg"></p>
     </div>
   </section>
@@ -176,12 +206,13 @@ details[open] summary::after{content:"–"}
 <script>
 /* ================= CUSTOMIZE: SETTINGS ================= */
 const LOG_ENDPOINT = "https://script.google.com/macros/s/AKfycbyo0F755sIoZVwQ_pt5w5G8tcJE5nXhiTG1z0zSaEq2mC5YLlnKgUZbi-HZgoDpLhZo/exec";      // Google Apps Script web-app URL (saves plays to a Google Sheet)
-const SHOWS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmtHzQj29YbHV0TRL-l2yk_Zomh23ewQ4z4DCauFj0pm--aN-1m233wwh1ZODfTNJ977sCumEDjJOc/pub?output=csv";     // Published CSV link of your "shows" Google Sheet. Leave empty to use the built-in list below.
+const SHOWS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmtHzQj29YbHV0TRL-l2yk_Zomh23ewQ4z4DCauFj0pm--aN-1m233wwh1ZODfTNJ977sCumEDjJOc/pubhtml";     // Published CSV link of your "shows" Google Sheet. Leave empty to use the built-in list below.
 const CLIP_SECONDS = 12;      // how long each clip plays
 const ASSETS = {              // put your drawings in an "assets" folder in the repo, then fill these in
   bird: "",                   // e.g. "assets/bird.png"
   birdHappy: "", birdWow: "", birdMeh: "",
   record: "",                 // e.g. "assets/record.png" (replaces the drawn record)
+  arm: "",                    // e.g. "assets/arm.png" (replaces the drawn tonearm)
 };
 /* Round plan: "known" = well-known songs, "mix" = one known vs one Songbyrd artist (optional), "local" = two Songbyrd artists. */
 const PLAN = ["known","known","known","known","local","local","local","local"];
@@ -298,7 +329,7 @@ const SHOWS = [
   "date": "2026-11-19",
   "name": "ViRG (Album Release)",
   "with": "Anthony Pirog and Red Sunflower, Dumb Lucky",
-  "discount": false,
+  "discount": true,
   "link": "https://dice.fm/partner/tickets/event/dkyrbq-virg-album-release-show-19th-nov-songbyrd-washington-dc-tickets?dice_id=10650804&dice_channel=web&dice_tags=organic&dice_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&dice_feature=mio_marketing&_branch_match_id=1610064063872345750&utm_source=web&utm_campaign=Songbyrd+LLC+dba+Songbyrd+Music+House&utm_medium=mio_marketing&_branch_referrer=H4sIAAAAAAAAA8soKSkottLXz8nMy9ZLyUxO1UvL1S8xSEpKSzVIMUhKTLWvK0pNSy0qysxLj08qyi8vTi2ydc4oys9NBQA32qRtOwAAAA%3D%3D&lng=en-US",
   "tags": [
    "dreamy"
@@ -639,7 +670,9 @@ function log(event, data={}){
 }
 
 /* Bird: your drawings if set, otherwise the placeholder. */
-const BIRD_SVG = '<svg class="bird" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="38" rx="20" ry="16" fill="#F7EE5B" stroke="#1F2252" stroke-width="3"/><circle cx="42" cy="24" r="11" fill="#F7EE5B" stroke="#1F2252" stroke-width="3"/><circle cx="45" cy="22" r="2.5" fill="#1F2252"/><path d="M52 25 l9 2 l-9 4z" fill="#D9454B" stroke="#1F2252" stroke-width="2"/><path d="M14 34 q-10 4 -6 14" fill="none" stroke="#1F2252" stroke-width="3"/></svg>';
+const BIRD_SVG = '<svg class="bird" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="38" rx="20" ry="16" fill="#FFF341" stroke="#1D2D5D" stroke-width="3"/><circle cx="42" cy="24" r="11" fill="#FFF341" stroke="#1D2D5D" stroke-width="3"/><circle cx="45" cy="22" r="2.5" fill="#1D2D5D"/><path d="M52 25 l9 2 l-9 4z" fill="#EF3C49" stroke="#1D2D5D" stroke-width="2"/><path d="M14 34 q-10 4 -6 14" fill="none" stroke="#1D2D5D" stroke-width="3"/></svg>';
+const ARM_SVG = '<svg viewBox="0 0 60 120" aria-hidden="true"><circle cx="47" cy="12" r="9" fill="#FFF8EC" stroke="#1D2D5D" stroke-width="3"/><path d="M47 12 L40 92 L22 108" fill="none" stroke="#1D2D5D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><rect x="10" y="102" width="18" height="11" rx="2" transform="rotate(-38 19 108)" fill="#EF3C49" stroke="#1D2D5D" stroke-width="3"/></svg>';
+document.querySelectorAll(".arm").forEach(a=>{ a.innerHTML = ASSETS.arm ? `<img src="${ASSETS.arm}" alt="">` : ARM_SVG; });
 function renderBird(slot, mood){
   const src = (mood && ASSETS["bird"+mood[0].toUpperCase()+mood.slice(1)]) || ASSETS.bird;
   slot.innerHTML = src ? `<img class="bird" src="${src}" alt="">` : BIRD_SVG;
@@ -663,6 +696,7 @@ function jsonp(term){
   });
 }
 const norm = s => (s||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+const words = s => " "+(s||"").toLowerCase().replace(/&/g," and ").replace(/[^a-z0-9]+/g," ").trim()+" ";
 function lookup(artist, song){
   const key=(artist+"|"+song).toLowerCase();
   if(saved[key]) return Promise.resolve(saved[key]);
@@ -670,7 +704,7 @@ function lookup(artist, song){
   mem[key]=(async()=>{
     const a=norm(artist), sg=norm(song);
     const pickFrom = res => {
-      const mine=(res||[]).filter(r=>r.previewUrl && norm(r.artistName).includes(a));
+      const wa=words(artist); const mine=(res||[]).filter(r=>r.previewUrl && words(r.artistName).includes(wa));
       return mine.find(r=>norm(r.trackName).startsWith(sg.slice(0,12))) || mine[0] || null;
     };
     let hit=null;
@@ -738,7 +772,7 @@ function nextPair(){
 }
 
 function renderProgress(){
-  $("progress").innerHTML = PLAN.map((k,i)=>`<span class="${i<state.round?'done':i===state.round?'now':''} ${k!=='known'?'local':''}"></span>`).join("");
+  $("progress").innerHTML = PLAN.map((k,i)=>`<span class="${i<state.round?'done':''}"></span>`).join("");
 }
 
 const bubbles = {known:["Round 1. Tap A, then B.","Round 2. Trust your gut.","Round 3. Keep going.","Round 4. Last warm-up."],
@@ -748,11 +782,13 @@ let bubbleIdx = {known:0,local:0};
 async function showRound(){
   stopAudio(); renderProgress();
   const kind = PLAN[state.round];
+  const localN = PLAN.slice(0,state.round).filter(k=>k!=="known").length;
+  document.body.className = kind==="known" ? "known" : "local v"+((localN%3)+1);
   $("bubble").textContent = bubbles[kind][bubbleIdx[kind]++] || `Round ${state.round+1} of ${PLAN.length}`;
   let pair = nextPair();
   if(!pair[0] || !pair[1]){ pair = [knownSong(otherTag([])), knownSong(otherTag([]))]; }
   state.cur = pair;
-  ["A","B"].forEach((w,i)=>{ $("hint"+w).textContent="▶ Play"; $("tag"+w).textContent = pair[i].show ? "" : ""; $("card"+w).classList.remove("chosen"); });
+  ["A","B"].forEach(w=>{ $("hint"+w).textContent="▶ Play"; $("card"+w).classList.remove("chosen"); });
   pair.forEach(p=>{ p.trackP = p.preview ? Promise.resolve({url:p.preview}) : lookup(p.artist,p.song); });
 }
 
@@ -781,24 +817,32 @@ async function tapCard(w){
 function pick(choice){
   stopAudio();
   const [a,b] = state.cur; let html;
-  const nameOf = p => p.show ? `<b>${esc(p.artist)}</b>` : `<b>${esc(p.song)}</b> by ${esc(p.artist)}`;
-  const localLine = p => p.show ? `<br><span class="local">Playing Songbyrd ${esc(fmtDate(p.show.date))}${p.show.discount?" · $5 off w/ student ID":""}</span>` : "";
+  // freeze this round's card colors so the reveal keeps them after the next round recolors the screen
+  const cs = getComputedStyle(document.body), rv = $("reveal");
+  [["--pa","--cardA"],["--pat","--cardAtext"],["--pb","--cardB"],["--pbt","--cardBtext"]].forEach(([k,v])=>rv.style.setProperty(k, cs.getPropertyValue(v).trim()));
+  const L = p => p===a ? "a" : "b";
+  const nameOf = p => p.show ? `<span class="pill ${L(p)}">${esc(p.artist)}</span>` : `<span class="pill ${L(p)}">${esc(p.song)}</span> by ${esc(p.artist)}`;
+  const tix = p => p.show ? `<a class="tix ${L(p)}" href="${esc(p.show.link)}" target="_blank" rel="noopener" data-show="${esc(p.show.name)}">${esc(p.artist)} →<small>${esc(fmtDate(p.show.date))}${p.show.discount?" · $5 off w/ student ID":""}</small></a>` : "";
+  let order = [a,b];
   if(choice==="N"){
     renderBird($("roundBird"),"meh");
-    html = `Neither. That was ${nameOf(a)} and ${nameOf(b)}.`;
+    html = `<div>Neither. That was ${nameOf(a)} and ${nameOf(b)}.</div>`;
   } else {
-    const win = choice==="A"?a:b, lose = choice==="A"?b:a;
+    const win = choice==="A"?a:b, lose = choice==="A"?b:a; order=[win,lose];
     $("card"+choice).classList.add("chosen");
     (win.show ? win.show.tags : [win.tag]).forEach(t=>state.scores[t]=(state.scores[t]||0)+1);
     if(win.show){ state.showBonus[win.show.name]=(state.showBonus[win.show.name]||0)+1; }
-    state.likedNames.push(win.show ? win.artist : win.artist);
+    state.likedNames.push(win.artist);
     renderBird($("roundBird"), win.show ? "wow" : "happy");
-    html = `You picked ${nameOf(win)} over ${nameOf(lose)}.${localLine(win)}${localLine(lose)}`;
+    html = `<div>You picked ${nameOf(win)} over ${nameOf(lose)}.</div>`;
   }
+  const tickets = order.map(tix).join("");
+  if(tickets) html += `<div class="tixrow">${tickets}</div>`;
   state.picks.push({a:a.artist+" - "+a.song, b:b.artist+" - "+b.song, choice});
-  $("reveal").innerHTML = html;
+  rv.innerHTML = html;
+  rv.querySelectorAll(".tix").forEach(x=>x.addEventListener("click",()=>log("tickets_click",{show:x.dataset.show, slot:"round"})));
   state.round++;
-  if(state.round>=PLAN.length) setTimeout(showResult, 1100); else setTimeout(showRound, 250);
+  if(state.round>=PLAN.length) setTimeout(showResult, 1400); else setTimeout(showRound, 250);
 }
 
 /* Matching: vibe fit plus a big boost for any Songbyrd artist you picked directly. */
@@ -818,7 +862,7 @@ function rankShows(){
 
 let result=null;
 async function showResult(){
-  stopAudio();
+  stopAudio(); document.body.className="";
   $("s-round").hidden=true; $("s-result").hidden=false; window.scrollTo(0,0);
   const ranked = rankShows(), top = ranked[0];
   const total = Object.values(state.scores).reduce((s,v)=>s+v,0);
@@ -834,13 +878,14 @@ async function showResult(){
     <div class="body">
       <div class="showname">${esc(top.name)}</div>
       <div class="when">${fmtDate(top.date)}</div>
+      <div class="where"><a href="https://www.google.com/maps/dir/?api=1&amp;destination=Songbyrd+Music+House%2C+540+Penn+St+NE%2C+Washington%2C+DC+20002" target="_blank" rel="noopener">Songbyrd · 540 Penn St NE ↗ directions</a></div>
       ${top.with?`<div class="with">with ${esc(top.with)}</div>`:""}
       ${top.note?`<div class="note">${esc(top.note)}</div>`:""}
       ${top.discount?`<span class="stamp">$5 off with student ID</span>`:""}
       <p class="why">${why}</p>
       <div class="cta">
-        <button class="btn teal" id="hear">▶ Hear them</button>
-        <a class="btn" id="tix" href="${esc(top.link)}" target="_blank" rel="noopener">Get tickets</a>
+        <button class="btn slide" id="hear" style="background:var(--coral);color:var(--yellow)">▶ Hear them</button>
+        <a class="btn slide" id="tix" href="${esc(top.link)}" target="_blank" rel="noopener">Get tickets</a>
       </div>
       <span class="applelink" id="apple"></span>
     </div>
@@ -862,7 +907,7 @@ async function showResult(){
   $("runners").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>log("tickets_click",{show:a.dataset.show, slot:"runner"})));
   const extras = EXTRAS.filter(e=>e.date>=TODAY);
   $("also").hidden = !extras.length;
-  $("also").innerHTML = `<b class="cap" style="font-family:var(--display)">ALSO AT SONGBYRD</b><ul>${extras.map(e=>`<li>${fmtDate(e.date)}: ${esc(e.text)}</li>`).join("")}</ul>`;
+  $("also").innerHTML = `<b class="cap">Also at Songbyrd</b><ul>${extras.map(e=>`<li>${fmtDate(e.date)}: ${esc(e.text)}</li>`).join("")}</ul>`;
   log("finish",{match:top.name, mix:mix.map(m=>m.label+" "+m.pct+"%").join(", "), picks:JSON.stringify(state.picks)});
 }
 
@@ -870,22 +915,30 @@ async function showResult(){
 function drawCard(){
   const {top} = result; const c=document.createElement("canvas"); c.width=1080; c.height=1920; const g=c.getContext("2d");
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
-  g.fillStyle=css("--bg"); g.fillRect(0,0,1080,1920);
-  g.fillStyle=css("--bg-dark"); for(let x=0;x<1080;x+=30) for(let y=0;y<1920;y+=30){ g.beginPath(); g.arc(x,y,2.5,0,7); g.fill(); }
-  g.fillStyle=css("--ink"); g.font="700 96px 'Space Mono', monospace"; g.fillText("My Songbyrd",86,246); g.fillText("show is…",86,356);
-  g.fillStyle=css("--yellow"); g.fillText("My Songbyrd",80,240); g.fillText("show is…",80,350);
-  g.fillStyle=css("--ink"); g.fillRect(96,476,912,1060);
-  g.fillStyle=css("--paper"); g.fillRect(80,460,912,1060); g.strokeStyle=css("--ink"); g.lineWidth=8; g.strokeRect(80,460,912,1060);
-  g.fillStyle=css("--ink"); g.fillRect(80,460,912,90);
-  g.fillStyle=css("--yellow"); g.font="700 36px 'Space Mono', monospace"; g.fillText(`YOUR SONGBYRD SHOW · ${top.pct}%`,120,520);
-  g.fillStyle=css("--ink"); g.font="700 88px 'Space Mono', monospace"; const yEnd = wrap(g, top.name, 120, 680, 830, 96, 4);
+  const NAVY=css("--navy"), YEL=css("--yellow"), BLUE=css("--blue"), COR=css("--coral"), MINT=css("--mint"), PAPER=css("--paper"), GREEN=css("--green");
+  g.fillStyle=NAVY; g.fillRect(0,0,1080,1920);
+  // Byrdland band behind the headline
+  g.save(); g.beginPath(); g.rect(0,120,1080,330); g.clip();
+  for(let x=-600;x<1300;x+=36){ g.fillStyle="#111"; g.beginPath(); g.moveTo(x,120); g.lineTo(x+18,120); g.lineTo(x+18+330,450); g.lineTo(x+330,450); g.fill(); }
+  g.fillStyle="#fff"; g.globalCompositeOperation="destination-over"; g.fillRect(0,120,1080,330); g.globalCompositeOperation="source-over";
+  g.fillStyle=COR; g.beginPath(); g.moveTo(330,120); g.lineTo(1080,120); g.lineTo(1080,450); g.lineTo(200,450); g.fill();
+  g.fillStyle=MINT; g.beginPath(); g.moveTo(700,120); g.lineTo(1080,120); g.lineTo(1080,450); g.lineTo(570,450); g.fill();
+  g.restore();
+  g.font="400 104px 'Archivo Black', 'Arial Black', sans-serif";
+  g.fillStyle=BLUE; g.fillText("MY SONGBYRD",68,266); g.fillText("SHOW IS…",68,386);
+  g.fillStyle=YEL; g.fillText("MY SONGBYRD",60,258); g.fillText("SHOW IS…",60,378);
+  g.fillStyle=NAVY; g.fillRect(100,540,900,1000);
+  g.fillStyle=PAPER; g.fillRect(80,520,900,1000);
+  g.fillStyle=NAVY; g.fillRect(80,520,900,90);
+  g.fillStyle=YEL; g.font="700 36px 'Space Mono', monospace"; g.fillText(`YOUR SONGBYRD SHOW · ${top.pct}%`,120,580);
+  g.fillStyle=NAVY; g.font="400 84px 'Archivo Black', 'Arial Black', sans-serif"; const yEnd = wrap(g, top.name.toUpperCase(), 120, 740, 820, 92, 4);
   g.font="700 50px 'Space Mono', monospace"; g.fillText(fmtDate(top.date), 120, yEnd+110);
   g.font="500 40px Archivo, sans-serif"; g.fillText("Songbyrd · 540 Penn St NE, DC", 120, yEnd+175);
-  if(top.discount){ g.save(); g.translate(120,yEnd+290); g.rotate(-.05); g.fillStyle="#fff"; g.fillRect(0,-56,560,76); g.strokeStyle=css("--green"); g.lineWidth=6; g.strokeRect(0,-56,560,76); g.fillStyle=css("--green"); g.font="700 36px 'Space Mono', monospace"; g.fillText("$5 OFF WITH STUDENT ID",22,-5); g.restore(); }
-  g.strokeStyle=css("--ink"); g.setLineDash([24,18]); g.beginPath(); g.moveTo(110,1430); g.lineTo(962,1430); g.stroke(); g.setLineDash([]);
-  g.font="700 32px 'Space Mono', monospace"; g.fillText(("ADMIT ONE · "+(state.school||"SONGBYRD FAN")).toUpperCase().slice(0,42),120,1490);
-  g.fillStyle=css("--yellow"); g.font="700 52px 'Space Mono', monospace"; g.fillText("Find yours →",80,1720);
-  g.fillStyle=css("--paper"); g.font="400 36px 'Space Mono', monospace"; g.fillText("scan a flyer or tap the link",80,1785);
+  if(top.discount){ g.save(); g.translate(120,yEnd+290); g.rotate(-.05); g.fillStyle=GREEN; g.fillRect(0,-56,540,76); g.fillStyle="#fff"; g.font="700 36px 'Space Mono', monospace"; g.fillText("$5 OFF WITH STUDENT ID",22,-5); g.restore(); }
+  g.strokeStyle=NAVY; g.lineWidth=6; g.setLineDash([24,18]); g.beginPath(); g.moveTo(110,1420); g.lineTo(950,1420); g.stroke(); g.setLineDash([]);
+  g.fillStyle=NAVY; g.font="700 32px 'Space Mono', monospace"; g.fillText(("ADMIT ONE · "+(state.school||"SONGBYRD FAN")).toUpperCase().slice(0,40),120,1480);
+  g.fillStyle=YEL; g.font="400 56px 'Archivo Black', 'Arial Black', sans-serif"; g.fillText("FIND YOURS →",80,1720);
+  g.fillStyle=PAPER; g.font="400 36px 'Space Mono', monospace"; g.fillText("scan a flyer or tap the link",80,1790);
   return c;
 }
 function wrap(g,text,x,y,maxW,lh,maxLines){
@@ -915,7 +968,7 @@ $("pickA").addEventListener("click",()=>pick("A"));
 $("pickB").addEventListener("click",()=>pick("B"));
 $("pickN").addEventListener("click",()=>pick("N"));
 $("share").addEventListener("click",shareCard);
-$("again").addEventListener("click",()=>{ stopAudio(); $("s-result").hidden=true; $("s-start").hidden=false; window.scrollTo(0,0); });
+$("again").addEventListener("click",()=>{ stopAudio(); document.body.className="start"; $("s-result").hidden=true; $("s-start").hidden=false; window.scrollTo(0,0); });
 $("emailGo").addEventListener("click",()=>{
   const v=$("email").value.trim();
   if(!/^\S+@\S+\.\S+$/.test(v)){ $("emailMsg").textContent="That email doesn't look right. Check for typos."; return; }
