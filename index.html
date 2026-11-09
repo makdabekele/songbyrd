@@ -175,7 +175,7 @@ details[open] summary::after{content:"–"}
 
 <script>
 /* ================= CUSTOMIZE: SETTINGS ================= */
-const LOG_ENDPOINT = "";      // Google Apps Script web-app URL (saves plays to a Google Sheet)
+const LOG_ENDPOINT = "https://makdabekele.github.io/songbyrd/";      // Google Apps Script web-app URL (saves plays to a Google Sheet)
 const CLIP_SECONDS = 12;      // how long each clip plays
 const ASSETS = {              // put your drawings in an "assets" folder in the repo, then fill these in
   bird: "",                   // e.g. "assets/bird.png"
@@ -588,7 +588,7 @@ const UPCOMING = SHOWS.filter(s=>s.date>=TODAY && s.tags.length);
 function log(event, data={}){
   if(!LOG_ENDPOINT) return;
   try{ fetch(LOG_ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},
-    body:JSON.stringify({event, ts:new Date().toISOString(), school:state.school, source:SOURCE, ...data})}); }catch(e){}
+    body:JSON.stringify({event, ts:new Date().toISOString(), play:state.playId, school:state.school, source:SOURCE, ...data})}); }catch(e){}
 }
 
 /* Bird: your drawings if set, otherwise the placeholder. */
@@ -859,7 +859,7 @@ async function shareCard(){
 /* ================= WIRING ================= */
 $("go").addEventListener("click",()=>{
   Object.keys(VIBES).forEach(t=>knownPools[t]=shuffle(VIBES[t].songs.map(([artist,song])=>({artist,song,tag:t}))));
-  Object.assign(state,{school:$("school").value, round:0, scores:{}, showBonus:{}, picks:[], used:new Set(), likedNames:[]});
+  Object.assign(state,{playId:Math.random().toString(36).slice(2,10), school:$("school").value, round:0, scores:{}, showBonus:{}, picks:[], used:new Set(), likedNames:[]});
   bubbleIdx={known:0,mix:0,local:0};
   $("s-start").hidden=true; $("s-round").hidden=false; $("reveal").textContent="Listen to both, then pick one.";
   renderBird($("roundBird"),""); log("start"); showRound();
