@@ -5,116 +5,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Find Your Songbyrd Show</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Didact+Gothic&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Archivo:wght@500;600;800&display=swap">
 <style>
-/* Layout: one phone-width column, a "this or that" game that ends on a paper ticket stub.
-   Palette borrowed from Makda's pitch deck. Swap in hand-drawn assets wherever you see ASSET. */
+/* ================= CUSTOMIZE: COLORS & FONTS =================
+   Change any hex value below and the whole game updates.        */
 :root{
-  --red:#E0494F;      /* main background */
-  --teal:#7EC4D4;     /* card B, accents */
-  --yellow:#F5EE5A;   /* headlines, card A */
-  --navy:#26295E;     /* text, outlines */
-  --paper:#FBF6E9;    /* ticket stub */
-  --green:#3E9A57;    /* "go" states */
+  --bg:#D9454B;        /* page background (red) */
+  --bg-dark:#B8343A;   /* texture dots + shadows on red */
+  --ink:#1F2252;       /* outlines and main text */
+  --paper:#FFF8E7;     /* panels, ticket */
+  --yellow:#F7EE5B;    /* card A, buttons */
+  --teal:#86CAD9;      /* card B */
+  --green:#2E8A4B;     /* $5 stamp */
   --display:"Space Mono", ui-monospace, Menlo, monospace;
-  --body:"Didact Gothic", "Century Gothic", "Avenir Next", system-ui, sans-serif;
+  --body:"Archivo", "Helvetica Neue", Arial, sans-serif;
   color-scheme:light;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;min-height:100%}
 body{
-  background:var(--red);color:var(--navy);font-family:var(--body);font-size:17px;line-height:1.45;
-  padding:max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background-color:var(--bg);
+  background-image:radial-gradient(var(--bg-dark) 1.2px, transparent 1.3px);
+  background-size:14px 14px;
+  color:var(--ink);font-family:var(--body);font-weight:500;font-size:17px;line-height:1.45;
+  padding:max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
-.app{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
-.top{display:flex;justify-content:space-between;align-items:center;font-family:var(--display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow)}
-h1,h2{font-family:var(--display);font-weight:700;line-height:1;margin:0;text-wrap:balance}
-h1{font-size:44px;color:var(--yellow)}
-h2{font-size:26px}
+.app{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.top{display:flex;justify-content:space-between;font-family:var(--display);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--paper)}
+h1{font-family:var(--display);font-weight:700;font-size:42px;line-height:1;margin:0;color:var(--yellow);text-shadow:3px 3px 0 var(--ink);text-wrap:balance}
 p{margin:0}
-.btn{
-  font-family:var(--display);font-weight:700;font-size:17px;border:3px solid var(--navy);border-radius:4px;
-  background:var(--yellow);color:var(--navy);padding:14px 18px;cursor:pointer;box-shadow:4px 4px 0 var(--navy);
-  text-decoration:none;display:inline-block;text-align:center;
-}
-.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--navy)}
-.btn.ghost{background:transparent;color:var(--yellow);border-color:var(--yellow);box-shadow:none}
-.btn:focus-visible,select:focus-visible,input:focus-visible,.card:focus-visible{outline:3px dashed var(--yellow);outline-offset:3px}
-.screen[hidden]{display:none!important}
-.screen{display:flex;flex-direction:column;gap:18px}
-.lede{color:var(--paper);font-size:19px}
-label{font-family:var(--display);font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--yellow)}
-select,input[type=email]{width:100%;font:inherit;padding:12px;border:3px solid var(--navy);border-radius:4px;background:var(--paper);color:var(--navy)}
-.field{display:flex;flex-direction:column;gap:6px}
-.small{font-size:13px;color:var(--paper);opacity:.9}
+.panel{background:var(--paper);border:3px solid var(--ink);border-radius:8px;box-shadow:5px 5px 0 var(--ink);padding:16px}
+.btn{font-family:var(--display);font-weight:700;font-size:17px;border:3px solid var(--ink);border-radius:6px;background:var(--yellow);color:var(--ink);
+  padding:14px 16px;cursor:pointer;box-shadow:4px 4px 0 var(--ink);text-decoration:none;display:inline-block;text-align:center}
+.btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
+.btn.teal{background:var(--teal)}
+.btn.big{font-size:20px;padding:16px}
+.link{background:none;border:0;font-family:var(--display);font-size:15px;color:var(--paper);text-decoration:underline;cursor:pointer;padding:6px;align-self:center}
+.btn:focus-visible,.link:focus-visible,select:focus-visible,input:focus-visible,.card:focus-visible,summary:focus-visible{outline:3px dashed var(--yellow);outline-offset:3px}
+.screen{display:flex;flex-direction:column;gap:20px}
+label.cap{font-family:var(--display);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+select,input[type=email]{width:100%;font:inherit;padding:12px;border:3px solid var(--ink);border-radius:6px;background:#fff;color:var(--ink)}
+.field{display:flex;flex-direction:column;gap:8px}
 
-/* Bird (ASSET: replace the SVG with your drawings: bird-idle / bird-happy / bird-wow / bird-meh) */
+/* Bird: replace with your drawing by setting ASSETS.bird in the script */
 .birdrow{display:flex;align-items:center;gap:12px}
-.bird{width:64px;height:64px;flex:none;transition:transform .25s}
-.bird.happy{transform:rotate(-10deg) scale(1.08)}
-.bird.wow{transform:translateY(-8px) scale(1.12)}
-.bird.meh{transform:rotate(8deg) scale(.95)}
-.bubble{background:var(--paper);border:3px solid var(--navy);border-radius:14px;padding:8px 12px;font-family:var(--display);font-size:14px;position:relative}
+.bird{width:70px;height:70px;flex:none;transition:transform .25s;object-fit:contain}
+.bird.happy{transform:rotate(-10deg) scale(1.08)}.bird.wow{transform:translateY(-8px) scale(1.12)}.bird.meh{transform:rotate(8deg) scale(.95)}
+.bubble{background:var(--paper);border:3px solid var(--ink);border-radius:16px;padding:10px 14px;font-family:var(--display);font-size:15px;box-shadow:3px 3px 0 var(--ink)}
 
-/* Progress */
 .progress{display:flex;gap:6px}
-.progress span{flex:1;height:10px;border:2px solid var(--navy);background:var(--paper);border-radius:2px}
-.progress span.done{background:var(--yellow)}
-.progress span.now{background:var(--teal)}
+.progress span{flex:1;height:12px;border:2px solid var(--ink);background:var(--paper);border-radius:3px}
+.progress span.done{background:var(--yellow)}.progress span.now{background:var(--teal)}
+.progress span.local{border-style:dashed}
 
-/* Round cards */
-.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.card{
-  border:3px solid var(--navy);border-radius:6px;padding:14px 12px;display:flex;flex-direction:column;gap:10px;align-items:center;
-  box-shadow:5px 5px 0 var(--navy);cursor:pointer;min-width:0;text-align:center;
-}
-.card.a{background:var(--yellow)}
-.card.b{background:var(--teal)}
-.card .letter{font-family:var(--display);font-weight:700;font-size:28px;line-height:1}
-.record{width:100%;max-width:150px;aspect-ratio:1;border-radius:50%;
-  background:repeating-radial-gradient(circle,#1d1f45 0 3px,#2c2f66 3px 5px);display:grid;place-items:center;position:relative}
-.record::after{content:"";width:34%;aspect-ratio:1;border-radius:50%;background:var(--paper);border:3px solid var(--navy)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{border:3px solid var(--ink);border-radius:8px;padding:14px 10px;display:flex;flex-direction:column;gap:10px;align-items:center;
+  box-shadow:6px 6px 0 var(--ink);cursor:pointer;min-width:0;text-align:center;transition:transform .15s}
+.card.a{background:var(--yellow);transform:rotate(-1.2deg)}.card.b{background:var(--teal);transform:rotate(1.2deg)}
+.card.chosen{outline:4px solid var(--paper);outline-offset:3px}
+.card .letter{font-family:var(--display);font-weight:700;font-size:30px;line-height:1}
+.record{width:100%;max-width:140px;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#1b1d47 0 3px,#2b2f68 3px 5px);display:grid;place-items:center;background-size:cover}
+.record::after{content:"";width:34%;aspect-ratio:1;border-radius:50%;background:var(--paper);border:3px solid var(--ink)}
 .card.playing .record{animation:spin 1.8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.card .hint{font-family:var(--display);font-size:12px;text-transform:uppercase}
-.bars{display:flex;gap:3px;height:16px;align-items:flex-end}
-.bars i{width:5px;background:var(--navy);height:3px}
-.card.playing .bars i{animation:bar .6s ease-in-out infinite alternate}
-.card.playing .bars i:nth-child(2){animation-delay:.15s}.card.playing .bars i:nth-child(3){animation-delay:.3s}.card.playing .bars i:nth-child(4){animation-delay:.45s}
-@keyframes bar{to{height:16px}}
-.picks{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.neither{justify-self:center}
-.reveal{background:var(--paper);border:3px solid var(--navy);border-radius:6px;padding:12px;font-size:15px;min-height:52px}
-.reveal b{font-family:var(--display)}
-.unavailable{font-size:13px}
+.hint{font-family:var(--display);font-size:13px;font-weight:700;text-transform:uppercase;background:var(--paper);border:2px solid var(--ink);border-radius:20px;padding:4px 10px}
+.tag{font-family:var(--display);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.picks{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.reveal{font-size:16px;min-height:56px}
+.reveal b{font-weight:800}
+.reveal .local{display:inline-block;margin-top:4px;font-family:var(--display);font-size:12px;text-transform:uppercase;background:var(--yellow);border:2px solid var(--ink);padding:2px 6px}
 
-/* Ticket stub */
-.stub{background:var(--paper);border:3px solid var(--navy);border-radius:6px;position:relative;box-shadow:6px 6px 0 var(--navy)}
-.stub .main{padding:18px;display:flex;flex-direction:column;gap:10px}
-.stub .perf{border-top:3px dashed var(--navy);margin:0 14px}
-.stub .tear{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;font-family:var(--display);font-size:13px}
-.stub::before,.stub::after{content:"";position:absolute;width:22px;height:22px;border-radius:50%;background:var(--red);border:3px solid var(--navy);top:calc(100% - 64px)}
-.stub::before{left:-14px}.stub::after{right:-14px}
-.eyebrow{font-family:var(--display);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
-.showname{font-family:var(--display);font-weight:700;font-size:28px;line-height:1.05;text-wrap:balance}
-.meta{font-size:15px}
-.stamp{align-self:flex-start;font-family:var(--display);font-weight:700;font-size:13px;color:var(--green);border:3px solid var(--green);padding:4px 8px;transform:rotate(-4deg);text-transform:uppercase}
-.mix{display:flex;flex-direction:column;gap:6px}
-.mixrow{display:grid;grid-template-columns:88px 1fr 40px;gap:8px;align-items:center;font-size:14px}
-.mixbar{height:12px;border:2px solid var(--navy);background:#fff}
-.mixbar i{display:block;height:100%;background:var(--red)}
+/* RESULT */
+.hero{background:var(--paper);border:4px solid var(--ink);border-radius:10px;box-shadow:8px 8px 0 var(--ink);position:relative;overflow:hidden}
+.hero .band{background:var(--ink);color:var(--yellow);font-family:var(--display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:10px 18px;display:flex;justify-content:space-between}
+.hero .body{padding:20px 18px;display:flex;flex-direction:column;gap:14px}
+.showname{font-family:var(--display);font-weight:700;font-size:38px;line-height:1.02;text-wrap:balance;word-break:break-word}
+.when{font-family:var(--display);font-size:20px;font-weight:700}
+.with{font-size:16px}
+.note{font-size:15px;font-style:italic}
+.stamp{align-self:flex-start;font-family:var(--display);font-weight:700;font-size:15px;color:var(--green);border:3px solid var(--green);padding:6px 10px;transform:rotate(-3deg);text-transform:uppercase;background:#fff}
+.why{font-size:16px;border-left:4px solid var(--bg);padding-left:10px}
+.cta{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hero .perf{border-top:3px dashed var(--ink);margin:0 14px}
+.hero .stubfoot{padding:12px 18px;font-family:var(--display);font-size:12px;display:flex;justify-content:space-between}
+.applelink{font-size:14px}
+details{background:var(--paper);border:3px solid var(--ink);border-radius:8px;box-shadow:4px 4px 0 var(--ink)}
+summary{cursor:pointer;padding:14px 16px;font-family:var(--display);font-weight:700;font-size:15px;list-style:none;display:flex;justify-content:space-between}
+summary::after{content:"+";font-size:20px;line-height:1}
+details[open] summary::after{content:"–"}
+.mix{display:flex;flex-direction:column;gap:8px;padding:0 16px 16px}
+.mixrow{display:grid;grid-template-columns:96px 1fr 44px;gap:8px;align-items:center;font-size:15px}
+.mixbar{height:14px;border:2px solid var(--ink);background:#fff;border-radius:3px;overflow:hidden}
+.mixbar i{display:block;height:100%;background:var(--bg)}
 .mixrow .pct{font-family:var(--display);font-variant-numeric:tabular-nums;text-align:right}
-.actions{display:flex;gap:10px;flex-wrap:wrap}
-.actions .btn{flex:1 1 140px}
-.runner{background:var(--paper);border:3px solid var(--navy);border-radius:6px;padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center}
-.runner .n{font-family:var(--display);font-weight:700;font-size:15px}
-.runner a{font-family:var(--display);font-size:13px;color:var(--navy)}
-.also{background:var(--teal);border:3px solid var(--navy);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;font-size:15px}
-.email{background:var(--paper);border:3px solid var(--navy);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:10px}
-.email label{color:var(--navy)}
-.check{display:flex;gap:8px;align-items:flex-start;font-size:13px}
-.sectionlabel{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--yellow)}
-.applelink{font-size:13px;color:var(--navy)}
+.sectionlabel{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--paper)}
+.runner{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.runner .n{font-family:var(--display);font-weight:700;font-size:16px}
+.runner a{font-family:var(--display);font-weight:700;font-size:14px;color:var(--ink);white-space:nowrap}
+.also{background:var(--teal)}
+.also ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:14px}
+.small{font-size:14px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -122,80 +114,78 @@ select,input[type=email]{width:100%;font:inherit;padding:12px;border:3px solid v
 <main class="app">
   <div class="top"><span>Songbyrd Music House</span><span>540 Penn St NE</span></div>
 
-  <!-- START -->
   <section class="screen" id="s-start">
     <h1>Find Your Songbyrd Show</h1>
-    <p class="lede">8 rounds of this or that. Pick the song you'd rather hear, and we'll match you to a show at Songbyrd this semester.</p>
-    <div class="birdrow">
-      <svg class="bird" id="bird0" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="38" rx="20" ry="16" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="42" cy="24" r="11" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="45" cy="22" r="2.5" fill="#26295E"/><path d="M52 25 l9 2 l-9 4z" fill="#E0494F" stroke="#26295E" stroke-width="2"/><path d="M14 34 q-10 4 -6 14" fill="none" stroke="#26295E" stroke-width="3"/></svg>
-      <div class="bubble">Headphones on. Tap a record to listen.</div>
+    <div class="birdrow"><span class="birdslot" data-mood=""></span>
+      <div class="bubble">8 rounds of this or that. Headphones on.</div></div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:14px">
+      <p>Pick the song you'd rather hear. It starts with songs you know and ends with artists playing Songbyrd this semester. We'll match you to a show.</p>
+      <div class="field">
+        <label class="cap" for="school">Where do you go?</label>
+        <select id="school">
+          <option value="">Pick your school</option>
+          <option>George Washington (GW)</option><option>Georgetown</option><option>American (AU)</option>
+          <option>Howard</option><option>Catholic</option><option>Gallaudet</option><option>UDC</option>
+          <option>University of Maryland</option><option>Other school</option><option>Not a student</option>
+        </select>
+      </div>
+      <button class="btn big" id="go">Start</button>
     </div>
-    <div class="field">
-      <label for="school">Where do you go?</label>
-      <select id="school">
-        <option value="">Pick your school</option>
-        <option>George Washington (GW)</option><option>Georgetown</option><option>American (AU)</option>
-        <option>Howard</option><option>Catholic</option><option>Gallaudet</option><option>UDC</option>
-        <option>University of Maryland</option><option>Other school</option><option>Not a student</option>
-      </select>
-    </div>
-    <button class="btn" id="go">Start</button>
   </section>
 
-  <!-- ROUND -->
   <section class="screen" id="s-round" hidden>
     <div class="progress" id="progress"></div>
-    <div class="birdrow">
-      <svg class="bird" id="bird" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="38" rx="20" ry="16" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="42" cy="24" r="11" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="45" cy="22" r="2.5" fill="#26295E"/><path d="M52 25 l9 2 l-9 4z" fill="#E0494F" stroke="#26295E" stroke-width="2"/><path d="M14 34 q-10 4 -6 14" fill="none" stroke="#26295E" stroke-width="3"/></svg>
-      <div class="bubble" id="bubble">Round 1. Tap A, then B.</div>
-    </div>
+    <div class="birdrow"><span class="birdslot" id="roundBird"></span><div class="bubble" id="bubble">Round 1</div></div>
     <div class="vs">
       <div class="card a" id="cardA" tabindex="0" role="button" aria-label="Play song A">
-        <span class="letter">A</span><div class="record"></div><div class="bars"><i></i><i></i><i></i><i></i></div><span class="hint" id="hintA">Tap to play</span>
+        <span class="letter">A</span><div class="record"></div><span class="hint" id="hintA">▶ Play</span><span class="tag" id="tagA"></span>
       </div>
       <div class="card b" id="cardB" tabindex="0" role="button" aria-label="Play song B">
-        <span class="letter">B</span><div class="record"></div><div class="bars"><i></i><i></i><i></i><i></i></div><span class="hint" id="hintB">Tap to play</span>
+        <span class="letter">B</span><div class="record"></div><span class="hint" id="hintB">▶ Play</span><span class="tag" id="tagB"></span>
       </div>
     </div>
     <div class="picks">
-      <button class="btn" id="pickA">I pick A</button>
-      <button class="btn" id="pickB" style="background:var(--teal)">I pick B</button>
+      <button class="btn big" id="pickA">Pick A</button>
+      <button class="btn big teal" id="pickB">Pick B</button>
     </div>
-    <button class="btn ghost neither" id="pickN">Neither</button>
-    <div class="reveal" id="reveal" aria-live="polite">Your picks show up here.</div>
+    <button class="link" id="pickN">Neither for me</button>
+    <div class="panel reveal" id="reveal" aria-live="polite">Listen to both, then pick one.</div>
   </section>
 
-  <!-- RESULT -->
   <section class="screen" id="s-result" hidden>
-    <div class="birdrow">
-      <svg class="bird wow" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="38" rx="20" ry="16" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="42" cy="24" r="11" fill="#F5EE5A" stroke="#26295E" stroke-width="3"/><circle cx="45" cy="22" r="2.5" fill="#26295E"/><path d="M52 25 l9 2 l-9 4z" fill="#E0494F" stroke="#26295E" stroke-width="2"/><path d="M14 34 q-10 4 -6 14" fill="none" stroke="#26295E" stroke-width="3"/></svg>
-      <div class="bubble">Your ticket's ready.</div>
-    </div>
-    <div class="stub" id="stub"></div>
-    <div class="actions">
+    <div class="birdrow"><span class="birdslot" data-mood="wow"></span><div class="bubble">Your ticket's ready.</div></div>
+    <div class="hero" id="hero"></div>
+    <div class="cta">
       <button class="btn" id="share">Save my ticket</button>
-      <button class="btn ghost" id="again">Play again</button>
+      <button class="btn teal" id="again">Play again</button>
     </div>
-    <div class="email" id="emailBox">
-      <label for="email">Get a reminder before your show</label>
+    <details id="stats"><summary>See your taste breakdown</summary><div class="mix" id="mix"></div></details>
+    <div class="sectionlabel">Two more you might like</div>
+    <div id="runners" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="panel also" id="also"></div>
+    <div class="panel" style="display:flex;flex-direction:column;gap:10px">
+      <label class="cap" for="email">Want a reminder before your show?</label>
       <input type="email" id="email" placeholder="you@school.edu" autocomplete="email">
       <label class="check" for="consent"><input type="checkbox" id="consent"> <span>Songbyrd can email me about upcoming shows. Unsubscribe anytime.</span></label>
       <button class="btn" id="emailGo">Send it</button>
-      <p class="small" id="emailMsg" style="color:var(--navy)"></p>
+      <p class="small" id="emailMsg"></p>
     </div>
-    <div class="sectionlabel">Two more you might like</div>
-    <div id="runners" style="display:flex;flex-direction:column;gap:10px"></div>
-    <div class="also" id="also"></div>
   </section>
 </main>
 
 <script>
-/* ===================== SETTINGS ===================== */
-const LOG_ENDPOINT = "";          // Paste your Google Apps Script web-app URL here to save plays to a Google Sheet.
-const ROUNDS = 8;
-const CLIP_SECONDS = 12;          // how long each clip plays per tap
+/* ================= CUSTOMIZE: SETTINGS ================= */
+const LOG_ENDPOINT = "";      // Google Apps Script web-app URL (saves plays to a Google Sheet)
+const CLIP_SECONDS = 12;      // how long each clip plays
+const ASSETS = {              // put your drawings in an "assets" folder in the repo, then fill these in
+  bird: "",                   // e.g. "assets/bird.png"
+  birdHappy: "", birdWow: "", birdMeh: "",
+  record: "",                 // e.g. "assets/record.png" (replaces the drawn record)
+};
+/* Round plan: "known" = well-known songs, "mix" = one known vs one Songbyrd artist, "local" = two Songbyrd artists. */
+const PLAN = ["known","known","known","mix","mix","local","local","local"];
 
-/* Songbyrd shows: generated from songbyrd_game_shows.csv. Shows hide themselves after their date. */
+/* Shows (from songbyrd_game_shows.csv). Each hides itself after its date. */
 const SHOWS = [
  {
   "date": "2026-11-12",
@@ -566,266 +556,315 @@ const SHOWS = [
  }
 ];
 
-/* Free / non-music nights for the "Also at Songbyrd" box. */
 const EXTRAS = [
   {date:"2026-11-24", text:"Can I Kick It? (Shaolin Jazz screening), free"},
   {date:"2026-11-30", text:"Songbyrd Music Trivia: Merry Thanxmas Edition, free"},
   {date:"2026-12-08", text:"Trappers Delight Holiday Comedy Series"},
 ];
 
-/* Reference songs used in the rounds: well-known tracks, grouped by vibe.
-   Edit freely. "start" (seconds) picks where inside Apple's 30-second preview the clip begins. */
+/* Well-known songs for the early rounds, by vibe. Add or swap freely: ["Artist","Song"]. */
 const VIBES = {
-  soulful:{label:"Soulful", songs:[["Olivia Dean","Dive"],["SZA","Snooze"],["Daniel Caesar","Get You"]]},
-  indie:{label:"Indie", songs:[["The Strokes","Reptilia"],["Arctic Monkeys","Do I Wanna Know?"],["Mitski","Washing Machine Heart"]]},
-  folk:{label:"Folk", songs:[["Noah Kahan","Stick Season"],["Phoebe Bridgers","Motion Sickness"],["Taylor Swift","cardigan"]]},
-  loud:{label:"Loud", songs:[["Turnstile","MYSTERY"],["Paramore","Misery Business"],["Deftones","Change (In the House of Flies)"]]},
-  dance:{label:"Dance", songs:[["Tyla","Water"],["Rema","Calm Down"],["Khruangbin","Time (You and I)"]]},
-  hiphop:{label:"Hip-hop", songs:[["Kendrick Lamar","Not Like Us"],["Tyler, The Creator","EARFQUAKE"],["A Tribe Called Quest","Can I Kick It?"]]},
-  dreamy:{label:"Dreamy", songs:[["Tame Impala","The Less I Know the Better"],["Cigarettes After Sex","Apocalypse"],["Lana Del Rey","Summertime Sadness"]]},
-  classic:{label:"Classic rock", songs:[["Jimi Hendrix","Purple Haze"],["Fleetwood Mac","Dreams"],["Janis Joplin","Piece of My Heart"]]},
+  soulful:{label:"Soulful", songs:[["Olivia Dean","Dive"],["SZA","Snooze"],["Daniel Caesar","Get You"],["Frank Ocean","Pink + White"],["Erykah Badu","On & On"]]},
+  indie:{label:"Indie", songs:[["The Strokes","Reptilia"],["Arctic Monkeys","Do I Wanna Know?"],["Mitski","Washing Machine Heart"],["Vampire Weekend","A-Punk"],["beabadoobee","Glue Song"]]},
+  folk:{label:"Folk", songs:[["Noah Kahan","Stick Season"],["Phoebe Bridgers","Motion Sickness"],["Taylor Swift","cardigan"],["Bon Iver","Skinny Love"],["Gracie Abrams","That's So True"]]},
+  loud:{label:"Loud", songs:[["Turnstile","MYSTERY"],["Paramore","Misery Business"],["Deftones","Change (In the House of Flies)"],["Green Day","Basket Case"],["Nirvana","Smells Like Teen Spirit"]]},
+  dance:{label:"Dance", songs:[["Tyla","Water"],["Rema","Calm Down"],["Khruangbin","Time (You and I)"],["Charli xcx","360"],["Daft Punk","Get Lucky"]]},
+  hiphop:{label:"Hip-hop", songs:[["Kendrick Lamar","Not Like Us"],["Tyler, The Creator","EARFQUAKE"],["A Tribe Called Quest","Can I Kick It?"],["Doechii","DENIAL IS A RIVER"],["Missy Elliott","Get Ur Freak On"]]},
+  dreamy:{label:"Dreamy", songs:[["Tame Impala","The Less I Know the Better"],["Cigarettes After Sex","Apocalypse"],["Lana Del Rey","Summertime Sadness"],["Beach House","Space Song"],["Clairo","Sofia"]]},
+  classic:{label:"Classic rock", songs:[["Jimi Hendrix","Purple Haze"],["Fleetwood Mac","Dreams"],["Janis Joplin","Piece of My Heart"],["Led Zeppelin","Immigrant Song"],["The Rolling Stones","Paint It Black"]]},
 };
 
-/* ===================== HELPERS ===================== */
+/* ================= HELPERS ================= */
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-const SOURCE = params.get("src") || "direct";             // e.g. ?src=flyer_gw  ?src=creator  ?src=wrgw
-const TODAY = params.get("today") || new Date().toLocaleDateString("en-CA"); // test with ?today=2026-11-20
+const SOURCE = params.get("src") || "direct";
+const TODAY = params.get("today") || new Date().toLocaleDateString("en-CA");
 const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
 const fmtDate = d => new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const UPCOMING = SHOWS.filter(s=>s.date>=TODAY && s.tags.length);
 
 function log(event, data={}){
   if(!LOG_ENDPOINT) return;
-  try{
-    fetch(LOG_ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},
-      body:JSON.stringify({event, ts:new Date().toISOString(), school:state.school, source:SOURCE, ...data})});
-  }catch(e){}
+  try{ fetch(LOG_ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain"},
+    body:JSON.stringify({event, ts:new Date().toISOString(), school:state.school, source:SOURCE, ...data})}); }catch(e){}
 }
 
-/* Apple Music preview lookup (JSONP, works from GitHub Pages or a local file). */
-const cache = {};
-let cbN = 0;
-function lookup(artist, song){
-  const key = (artist+"|"+song).toLowerCase();
-  if(cache[key]) return cache[key];
-  cache[key] = new Promise(resolve=>{
-    const name = "itcb"+(cbN++);
-    const s = document.createElement("script");
-    const done = v => { resolve(v); delete window[name]; s.remove(); };
-    const timer = setTimeout(()=>done(null), 6000);
-    window[name] = data => {
-      clearTimeout(timer);
-      const res = (data && data.results) || [];
-      const a = artist.toLowerCase();
-      const hit = res.find(r=>r.previewUrl && r.artistName && r.artistName.toLowerCase().includes(a)) || null;
-      done(hit ? {url:hit.previewUrl, link:hit.trackViewUrl, title:hit.trackName, artist:hit.artistName} : null);
-    };
-    s.onerror = ()=>{ clearTimeout(timer); done(null); };
-    s.src = "https://itunes.apple.com/search?entity=song&limit=10&callback="+name+"&term="+encodeURIComponent((artist+" "+song).trim());
+/* Bird: your drawings if set, otherwise the placeholder. */
+const BIRD_SVG = '<svg class="bird" viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="38" rx="20" ry="16" fill="#F7EE5B" stroke="#1F2252" stroke-width="3"/><circle cx="42" cy="24" r="11" fill="#F7EE5B" stroke="#1F2252" stroke-width="3"/><circle cx="45" cy="22" r="2.5" fill="#1F2252"/><path d="M52 25 l9 2 l-9 4z" fill="#D9454B" stroke="#1F2252" stroke-width="2"/><path d="M14 34 q-10 4 -6 14" fill="none" stroke="#1F2252" stroke-width="3"/></svg>';
+function renderBird(slot, mood){
+  const src = (mood && ASSETS["bird"+mood[0].toUpperCase()+mood.slice(1)]) || ASSETS.bird;
+  slot.innerHTML = src ? `<img class="bird" src="${src}" alt="">` : BIRD_SVG;
+  const b = slot.querySelector(".bird"); if(mood) b.classList.add(mood);
+}
+document.querySelectorAll(".birdslot").forEach(s=>renderBird(s, s.dataset.mood));
+if(ASSETS.record) document.querySelectorAll(".record").forEach(r=>{ r.style.backgroundImage=`url(${ASSETS.record})`; });
+
+/* Apple Music previews. Tries the exact song, then any song by that artist. Remembers results on this device. */
+const mem = {}; let cbN = 0;
+let saved = {}; try{ saved = JSON.parse(localStorage.getItem("sbclips")||"{}"); }catch(e){}
+function jsonp(term){
+  return new Promise(resolve=>{
+    const name="itcb"+(cbN++), s=document.createElement("script");
+    const done=v=>{ resolve(v); delete window[name]; s.remove(); };
+    const t=setTimeout(()=>done(null), 8000);
+    window[name]=d=>{ clearTimeout(t); done((d&&d.results)||[]); };
+    s.onerror=()=>{ clearTimeout(t); done(null); };
+    s.src="https://itunes.apple.com/search?entity=song&limit=15&country=US&callback="+name+"&term="+encodeURIComponent(term);
     document.head.appendChild(s);
   });
-  return cache[key];
+}
+const norm = s => (s||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+function lookup(artist, song){
+  const key=(artist+"|"+song).toLowerCase();
+  if(saved[key]) return Promise.resolve(saved[key]);
+  if(mem[key]) return mem[key];
+  mem[key]=(async()=>{
+    const a=norm(artist), sg=norm(song);
+    const pickFrom = res => {
+      const mine=(res||[]).filter(r=>r.previewUrl && norm(r.artistName).includes(a));
+      return mine.find(r=>norm(r.trackName).startsWith(sg.slice(0,12))) || mine[0] || null;
+    };
+    let hit=null;
+    for(const term of [artist+" "+song, artist]){
+      let res=await jsonp(term);
+      if(res===null){ await sleep(1200); res=await jsonp(term); }   // one retry if Apple was busy
+      hit=pickFrom(res); if(hit) break;
+    }
+    const v = hit ? {url:hit.previewUrl, link:hit.trackViewUrl, title:hit.trackName, artist:hit.artistName} : null;
+    if(v){ saved[key]=v; try{ localStorage.setItem("sbclips", JSON.stringify(saved)); }catch(e){} }
+    return v;
+  })();
+  return mem[key];
 }
 
-/* Audio player: one clip at a time. */
-const player = new Audio();
-let stopTimer = null, playingCard = null;
+const player = new Audio(); let stopTimer=null, playingCard=null;
 function stopAudio(){ player.pause(); clearTimeout(stopTimer); if(playingCard) playingCard.classList.remove("playing"); playingCard=null; }
-async function playClip(card, track, start=0){
-  stopAudio();
-  if(!track){ return false; }
-  player.src = track.url; player.currentTime = start;
+async function playClip(card, track){
+  stopAudio(); if(!track) return false;
+  player.src=track.url;
   try{ await player.play(); }catch(e){ return false; }
-  playingCard = card; if(card) card.classList.add("playing");
-  stopTimer = setTimeout(stopAudio, CLIP_SECONDS*1000);
-  return true;
+  playingCard=card; if(card) card.classList.add("playing");
+  stopTimer=setTimeout(stopAudio, CLIP_SECONDS*1000); return true;
 }
 player.addEventListener("ended", stopAudio);
 
-/* ===================== GAME ===================== */
-const state = {school:"", round:0, pairs:[], scores:{}, picks:[], heard:{A:false,B:false}};
+/* ================= GAME ================= */
+const state = {school:"", round:0, scores:{}, showBonus:{}, picks:[], used:new Set(), cur:null, likedNames:[]};
+const knownPools = {};
 
-function buildPairs(){
-  // Each vibe appears twice (two different songs); every round pits two different vibes.
-  const tags = Object.keys(VIBES);
-  const songPool = {}; tags.forEach(t=>songPool[t]=shuffle(VIBES[t].songs.map(([artist,song,start])=>({artist,song,start:start||0,tag:t}))));
-  const pairs = [];
-  for(let pass=0; pass<2; pass++){
-    const order = shuffle(tags);
-    for(let i=0;i+1<order.length;i+=2) pairs.push([songPool[order[i]].pop(), songPool[order[i+1]].pop()]);
-  }
-  return pairs.slice(0, ROUNDS);
+function topVibes(){ return Object.entries(state.scores).sort((a,b)=>b[1]-a[1]).map(e=>e[0]); }
+function knownSong(tag){
+  const pool = knownPools[tag]; const s = pool.find(x=>!state.used.has(x.artist+x.song));
+  if(!s) return null; state.used.add(s.artist+s.song); return s;
 }
+function localSong(prefTag, avoidTag){
+  const fresh = UPCOMING.filter(s=>!state.used.has(s.name));
+  let cands = fresh.filter(s=>s.tags.includes(prefTag) && !s.tags.includes(avoidTag));
+  if(!cands.length) cands = fresh.filter(s=>!s.tags.includes(avoidTag));
+  if(!cands.length) cands = fresh;
+  if(!cands.length) return null;
+  const s = shuffle(cands)[0]; state.used.add(s.name);
+  return {artist:s.artist, song:s.song, tag:s.tags[0], show:s, preview:s.preview};
+}
+function otherTag(not){ return shuffle(Object.keys(VIBES).filter(t=>!not.includes(t)))[0]; }
 
-function setBird(mood){ const b=$("bird"); b.classList.remove("happy","wow","meh"); if(mood) b.classList.add(mood); }
+/* Builds the next pair. Early rounds explore; later rounds lean toward what you've picked, with one contrast. */
+function nextPair(){
+  const kind = PLAN[state.round], tops = topVibes();
+  const lead = tops[0] || otherTag([]);
+  if(kind==="known"){
+    const t1 = state.round===0 ? otherTag([]) : (state.round===2 && tops[0] ? tops[0] : otherTag([]));
+    const t2 = otherTag([t1]);
+    return [knownSong(t1), knownSong(t2)];
+  }
+  if(kind==="mix"){
+    const contrast = otherTag([lead]);
+    const pair = [localSong(lead, null), knownSong(contrast)];
+    return Math.random()<.5 ? pair : pair.reverse();
+  }
+  const second = tops[1] || otherTag([lead]);
+  const a = localSong(lead, null);
+  const b = localSong(state.round===PLAN.length-1 ? lead : second, a ? a.tag : null);
+  return [a, b];
+}
 
 function renderProgress(){
-  $("progress").innerHTML = Array.from({length:ROUNDS},(_,i)=>`<span class="${i<state.round?'done':i===state.round?'now':''}"></span>`).join("");
+  $("progress").innerHTML = PLAN.map((k,i)=>`<span class="${i<state.round?'done':i===state.round?'now':''} ${k!=='known'?'local':''}"></span>`).join("");
 }
+
+const bubbles = {known:["Round 1. Tap A, then B.","Round 2. Trust your gut.","Round 3. Last warm-up."],
+  mix:["Round 4. One of these is playing Songbyrd soon.","Round 5. Can you tell which one is local?"],
+  local:["Round 6. Both of these are Songbyrd artists.","Round 7. Getting closer to your show.","Final round."]};
+let bubbleIdx = {known:0,mix:0,local:0};
 
 async function showRound(){
-  stopAudio();
-  renderProgress();
-  const [a,b] = state.pairs[state.round];
-  state.heard = {A:false,B:false};
-  $("hintA").textContent = "Tap to play"; $("hintB").textContent = "Tap to play";
-  $("bubble").textContent = state.round===0 ? "Round 1. Tap A, then B." : `Round ${state.round+1} of ${ROUNDS}.`;
-  // look up both clips now so taps feel instant
-  a.trackP = lookup(a.artist, a.song); b.trackP = lookup(b.artist, b.song);
-  // pre-fetch next round
-  const nxt = state.pairs[state.round+1]; if(nxt){ lookup(nxt[0].artist,nxt[0].song); lookup(nxt[1].artist,nxt[1].song); }
+  stopAudio(); renderProgress();
+  const kind = PLAN[state.round];
+  $("bubble").textContent = bubbles[kind][bubbleIdx[kind]++] || `Round ${state.round+1} of ${PLAN.length}`;
+  let pair = nextPair();
+  if(!pair[0] || !pair[1]){ pair = [knownSong(otherTag([])), knownSong(otherTag([]))]; }
+  state.cur = pair;
+  ["A","B"].forEach((w,i)=>{ $("hint"+w).textContent="▶ Play"; $("tag"+w).textContent = pair[i].show ? "" : ""; $("card"+w).classList.remove("chosen"); });
+  pair.forEach(p=>{ p.trackP = p.preview ? Promise.resolve({url:p.preview}) : lookup(p.artist,p.song); });
 }
 
-async function tapCard(which){
-  const item = state.pairs[state.round][which==="A"?0:1];
-  const card = $(which==="A"?"cardA":"cardB"), hint = $(which==="A"?"hintA":"hintB");
-  if(playingCard===card){ stopAudio(); hint.textContent="Tap to replay"; return; }
-  hint.textContent = "Loading…";
-  const track = await item.trackP;
-  const ok = await playClip(card, track, item.start);
-  if(ok){ hint.textContent = "Playing"; }
-  else { hint.innerHTML = `<span class="unavailable">Clip unavailable:<br><b>${esc(item.song)}</b><br>${esc(item.artist)}</span>`; }
-  state.heard[which] = true;
+/* If a clip won't load, quietly swap in another song from the same vibe. */
+async function ensurePlayable(i){
+  let p = state.cur[i];
+  for(let tries=0; tries<3; tries++){
+    const t = await p.trackP; if(t) return [p,t];
+    const repl = p.show ? localSong(p.tag, null) : knownSong(p.tag);
+    if(!repl) break;
+    repl.trackP = repl.preview ? Promise.resolve({url:repl.preview}) : lookup(repl.artist, repl.song);
+    state.cur[i] = p = repl;
+  }
+  return [p,null];
+}
+
+async function tapCard(w){
+  const i = w==="A"?0:1, card=$("card"+w), hint=$("hint"+w);
+  if(playingCard===card){ stopAudio(); hint.textContent="▶ Replay"; return; }
+  hint.textContent="Loading…";
+  const [p,t] = await ensurePlayable(i);
+  const ok = await playClip(card, t);
+  hint.textContent = ok ? "■ Playing" : "No clip, skip it";
 }
 
 function pick(choice){
   stopAudio();
-  const [a,b] = state.pairs[state.round];
-  let msg;
+  const [a,b] = state.cur; let html;
+  const nameOf = p => p.show ? `<b>${esc(p.artist)}</b>` : `<b>${esc(p.song)}</b> by ${esc(p.artist)}`;
+  const localLine = p => p.show ? `<br><span class="local">Playing Songbyrd ${esc(fmtDate(p.show.date))}${p.show.discount?" · $5 off w/ student ID":""}</span>` : "";
   if(choice==="N"){
-    setBird("meh");
-    msg = `Neither. Fair. That was <b>${esc(a.song)}</b> by ${esc(a.artist)} vs <b>${esc(b.song)}</b> by ${esc(b.artist)}.`;
+    renderBird($("roundBird"),"meh");
+    html = `Neither. That was ${nameOf(a)} and ${nameOf(b)}.`;
   } else {
     const win = choice==="A"?a:b, lose = choice==="A"?b:a;
-    state.scores[win.tag] = (state.scores[win.tag]||0) + 1;
-    setBird(state.round%2 ? "wow" : "happy");
-    msg = `You picked <b>${esc(win.song)}</b> by ${esc(win.artist)} over ${esc(lose.song)} by ${esc(lose.artist)}.`;
+    $("card"+choice).classList.add("chosen");
+    (win.show ? win.show.tags : [win.tag]).forEach(t=>state.scores[t]=(state.scores[t]||0)+1);
+    if(win.show){ state.showBonus[win.show.name]=(state.showBonus[win.show.name]||0)+1; }
+    state.likedNames.push(win.show ? win.artist : win.artist);
+    renderBird($("roundBird"), win.show ? "wow" : "happy");
+    html = `You picked ${nameOf(win)} over ${nameOf(lose)}.${localLine(win)}${localLine(lose)}`;
   }
   state.picks.push({a:a.artist+" - "+a.song, b:b.artist+" - "+b.song, choice});
-  $("reveal").innerHTML = msg;
+  $("reveal").innerHTML = html;
   state.round++;
-  if(state.round >= state.pairs.length){ setTimeout(showResult, 900); }
-  else { showRound(); }
+  if(state.round>=PLAN.length) setTimeout(showResult, 1100); else setTimeout(showRound, 250);
 }
 
-/* Matching: shows score by how much of your mix their vibes cover. Ties go to student-discount shows, then sooner shows. */
+/* Matching: vibe fit plus a big boost for any Songbyrd artist you picked directly. */
 function rankShows(){
   const total = Object.values(state.scores).reduce((s,v)=>s+v,0) || 1;
   const share = t => (state.scores[t]||0)/total;
-  const upcoming = SHOWS.filter(s=>s.date >= TODAY && s.tags.length);
-  const scored = upcoming.map(s=>{
+  const scored = UPCOMING.map(s=>{
     const vals = s.tags.map(share).sort((x,y)=>y-x);
-    const fit = (vals[0]||0) + 0.5*(vals[1]||0);
-    const days = (new Date(s.date) - new Date(TODAY))/864e5;
-    return {...s, fit, rank: fit + (s.discount?0.04:0) - days*0.0005};
+    const fit = (vals[0]||0) + .5*(vals[1]||0) + .6*(state.showBonus[s.name]||0);
+    const days = (new Date(s.date)-new Date(TODAY))/864e5;
+    return {...s, fit, rank: fit + (s.discount?.04:0) - days*.0005};
   }).sort((x,y)=>y.rank-x.rank);
-  const best = scored[0] ? scored[0].fit : 1;
-  scored.forEach(s=>s.pct = Math.round(70 + 29*(best ? s.fit/best : 0)) - (s===scored[0]?0:Math.round(Math.random()*3)));
+  const best = scored[0] ? scored[0].fit || 1 : 1;
+  scored.forEach((s,i)=>s.pct = Math.max(60, Math.round(72 + 27*(s.fit/best)) - i));
   return scored;
 }
 
-function mixRows(){
-  const total = Object.values(state.scores).reduce((s,v)=>s+v,0);
-  if(!total) return [];
-  return Object.entries(state.scores).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([t,v])=>({label:VIBES[t].label, pct:Math.round(100*v/total)}));
-}
-
-let result = null;
+let result=null;
 async function showResult(){
-  $("s-round").hidden = true; $("s-result").hidden = false; window.scrollTo(0,0);
-  const ranked = rankShows();
-  const top = ranked[0];
-  const mix = mixRows();
+  stopAudio();
+  $("s-round").hidden=true; $("s-result").hidden=false; window.scrollTo(0,0);
+  const ranked = rankShows(), top = ranked[0];
+  const total = Object.values(state.scores).reduce((s,v)=>s+v,0);
+  const mix = total ? Object.entries(state.scores).sort((a,b)=>b[1]-a[1]).map(([t,v])=>({label:VIBES[t].label, pct:Math.round(100*v/total)})) : [];
   result = {top, mix};
-  if(!top){ $("stub").innerHTML = `<div class="main"><p>No upcoming shows right now. Check songbyrddc.com for new dates.</p></div>`; return; }
-  $("stub").innerHTML = `
-    <div class="main">
-      <span class="eyebrow">Admit one · ${esc(state.school || "Songbyrd fan")}</span>
-      <span class="eyebrow">Your Songbyrd match · ${top.pct}%</span>
+  if(!top){ $("hero").innerHTML = `<div class="body"><p>No upcoming shows right now. Check songbyrddc.com for new dates.</p></div>`; return; }
+  const pickedThem = state.showBonus[top.name];
+  const liked = [...new Set(state.likedNames)].slice(-3);
+  const why = pickedThem ? `You picked ${esc(top.artist)} blind in this game.` :
+              liked.length ? `Because you picked ${liked.map(esc).join(", ")}.` : `Here's a show we think you'd like.`;
+  $("hero").innerHTML = `
+    <div class="band"><span>Your Songbyrd show</span><span>${top.pct}% match</span></div>
+    <div class="body">
       <div class="showname">${esc(top.name)}</div>
-      <div class="meta">${fmtDate(top.date)} · Songbyrd, 540 Penn St NE${top.with?`<br>with ${esc(top.with)}`:""}${top.note?`<br><i>${esc(top.note)}</i>`:""}</div>
+      <div class="when">${fmtDate(top.date)}</div>
+      ${top.with?`<div class="with">with ${esc(top.with)}</div>`:""}
+      ${top.note?`<div class="note">${esc(top.note)}</div>`:""}
       ${top.discount?`<span class="stamp">$5 off with student ID</span>`:""}
-      <div class="mix">${mix.map(m=>`<div class="mixrow"><span>${m.label}</span><span class="mixbar"><i style="width:${m.pct}%"></i></span><span class="pct">${m.pct}%</span></div>`).join("") || `<p class="meta">You skipped every round, so here's the next show we think you'd like.</p>`}</div>
-      <div class="actions">
-        <button class="btn" id="hear" style="background:var(--teal)">▶ Hear ${esc(top.artist)}</button>
+      <p class="why">${why}</p>
+      <div class="cta">
+        <button class="btn teal" id="hear">▶ Hear them</button>
         <a class="btn" id="tix" href="${esc(top.link)}" target="_blank" rel="noopener">Get tickets</a>
       </div>
       <span class="applelink" id="apple"></span>
     </div>
     <div class="perf"></div>
-    <div class="tear"><span>SONGBYRD MUSIC HOUSE</span><span>№ ${String(Math.floor(Math.random()*9000)+1000)}</span></div>`;
+    <div class="stubfoot"><span>ADMIT ONE · ${esc((state.school||"Songbyrd fan").toUpperCase())}</span><span>DC</span></div>`;
   $("tix").addEventListener("click",()=>log("tickets_click",{show:top.name, slot:"match"}));
   $("hear").addEventListener("click", async ()=>{
+    $("hear").textContent="Loading…";
     const t = top.preview ? {url:top.preview} : await lookup(top.artist, top.song);
-    const ok = await playClip(null, t, top.start||0);
-    if(!ok) $("apple").textContent = `Couldn't load a clip for ${top.artist}. Look up "${top.song}" on your music app.`;
-    else if(t.link) $("apple").innerHTML = `<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:inherit">Listen on Apple Music</a>`;
+    const ok = await playClip(null, t);
+    $("hear").textContent = ok ? "■ Playing" : "▶ Hear them";
+    $("apple").innerHTML = ok ? (t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:inherit">${esc(t.title||top.song)}, on Apple Music</a>`:"")
+                              : `Couldn't load a clip. Search "${esc(top.song)}" by ${esc(top.artist)} in your music app.`;
   });
-  $("runners").innerHTML = ranked.slice(1,3).map((s,i)=>`
-    <div class="runner"><div><div class="n">${esc(s.name)}</div><div class="meta">${fmtDate(s.date)}${s.discount?" · $5 off w/ student ID":""}</div></div>
+  $("mix").innerHTML = mix.length ? mix.map(m=>`<div class="mixrow"><span>${m.label}</span><span class="mixbar"><i style="width:${m.pct}%"></i></span><span class="pct">${m.pct}%</span></div>`).join("") : `<p>You skipped every round, so no breakdown this time.</p>`;
+  $("runners").innerHTML = ranked.slice(1,3).map(s=>`
+    <div class="panel runner"><div><div class="n">${esc(s.name)}</div><div class="small">${fmtDate(s.date)}${s.discount?" · $5 off w/ student ID":""}</div></div>
     <a href="${esc(s.link)}" target="_blank" rel="noopener" data-show="${esc(s.name)}">Tickets →</a></div>`).join("");
   $("runners").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>log("tickets_click",{show:a.dataset.show, slot:"runner"})));
   const extras = EXTRAS.filter(e=>e.date>=TODAY);
-  $("also").innerHTML = extras.length ? `<b class="eyebrow">Also at Songbyrd</b>${extras.map(e=>`<span>${fmtDate(e.date)}: ${esc(e.text)}</span>`).join("")}` : "";
   $("also").hidden = !extras.length;
+  $("also").innerHTML = `<b class="cap" style="font-family:var(--display)">ALSO AT SONGBYRD</b><ul>${extras.map(e=>`<li>${fmtDate(e.date)}: ${esc(e.text)}</li>`).join("")}</ul>`;
   log("finish",{match:top.name, mix:mix.map(m=>m.label+" "+m.pct+"%").join(", "), picks:JSON.stringify(state.picks)});
 }
 
-/* Share card: a 1080x1920 ticket image for Instagram Stories. ASSET: draw your own background and set it here. */
+/* Share image for Instagram Stories (1080x1920). */
 function drawCard(){
-  const {top, mix} = result; const c = document.createElement("canvas"); c.width=1080; c.height=1920; const g=c.getContext("2d");
-  g.fillStyle="#E0494F"; g.fillRect(0,0,1080,1920);
-  g.fillStyle="#F5EE5A"; g.font="700 92px 'Space Mono', monospace"; g.fillText("My Songbyrd", 80, 230); g.fillText("show is…", 80, 340);
-  // stub
-  g.fillStyle="#26295E"; g.fillRect(92,452,912,1100);
-  g.fillStyle="#FBF6E9"; g.fillRect(80,440,912,1100);
-  g.strokeStyle="#26295E"; g.lineWidth=8; g.strokeRect(80,440,912,1100);
-  g.fillStyle="#26295E"; g.font="400 34px 'Space Mono', monospace";
-  g.fillText(("ADMIT ONE · "+(state.school||"SONGBYRD FAN")).toUpperCase().slice(0,40), 130, 520);
-  g.fillText(`YOUR MATCH · ${top.pct}%`, 130, 575);
-  g.font="700 76px 'Space Mono', monospace";
-  wrap(g, top.name, 130, 690, 820, 86, 4);
-  g.font="400 40px 'Didact Gothic', sans-serif";
-  g.fillText(fmtDate(top.date)+" · Songbyrd DC", 130, 1060);
-  if(top.discount){ g.save(); g.translate(130,1150); g.rotate(-0.06); g.strokeStyle="#3E9A57"; g.lineWidth=6; g.strokeRect(0,-50,520,70); g.fillStyle="#3E9A57"; g.font="700 34px 'Space Mono', monospace"; g.fillText("$5 OFF WITH STUDENT ID",18,-3); g.restore(); }
-  let y=1260; g.font="400 34px 'Didact Gothic', sans-serif";
-  mix.forEach(m=>{ g.fillStyle="#26295E"; g.fillText(m.label, 130, y); g.strokeRect(400,y-30,420,34); g.fillStyle="#E0494F"; g.fillRect(404,y-26,412*m.pct/100,26); g.fillStyle="#26295E"; g.fillText(m.pct+"%",850,y); y+=70; });
-  g.setLineDash([22,18]); g.beginPath(); g.moveTo(110,1450); g.lineTo(962,1450); g.stroke(); g.setLineDash([]);
-  g.font="700 34px 'Space Mono', monospace"; g.fillText("SONGBYRD MUSIC HOUSE · 540 PENN ST NE", 130, 1510);
-  g.fillStyle="#F5EE5A"; g.font="700 46px 'Space Mono', monospace"; g.fillText("Find yours →", 80, 1720);
-  g.font="400 36px 'Space Mono', monospace"; g.fillText("link in bio / scan the flyer", 80, 1785);
+  const {top} = result; const c=document.createElement("canvas"); c.width=1080; c.height=1920; const g=c.getContext("2d");
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  g.fillStyle=css("--bg"); g.fillRect(0,0,1080,1920);
+  g.fillStyle=css("--bg-dark"); for(let x=0;x<1080;x+=30) for(let y=0;y<1920;y+=30){ g.beginPath(); g.arc(x,y,2.5,0,7); g.fill(); }
+  g.fillStyle=css("--ink"); g.font="700 96px 'Space Mono', monospace"; g.fillText("My Songbyrd",86,246); g.fillText("show is…",86,356);
+  g.fillStyle=css("--yellow"); g.fillText("My Songbyrd",80,240); g.fillText("show is…",80,350);
+  g.fillStyle=css("--ink"); g.fillRect(96,476,912,1060);
+  g.fillStyle=css("--paper"); g.fillRect(80,460,912,1060); g.strokeStyle=css("--ink"); g.lineWidth=8; g.strokeRect(80,460,912,1060);
+  g.fillStyle=css("--ink"); g.fillRect(80,460,912,90);
+  g.fillStyle=css("--yellow"); g.font="700 36px 'Space Mono', monospace"; g.fillText(`YOUR SONGBYRD SHOW · ${top.pct}%`,120,520);
+  g.fillStyle=css("--ink"); g.font="700 88px 'Space Mono', monospace"; const yEnd = wrap(g, top.name, 120, 680, 830, 96, 4);
+  g.font="700 50px 'Space Mono', monospace"; g.fillText(fmtDate(top.date), 120, yEnd+110);
+  g.font="500 40px Archivo, sans-serif"; g.fillText("Songbyrd · 540 Penn St NE, DC", 120, yEnd+175);
+  if(top.discount){ g.save(); g.translate(120,yEnd+290); g.rotate(-.05); g.fillStyle="#fff"; g.fillRect(0,-56,560,76); g.strokeStyle=css("--green"); g.lineWidth=6; g.strokeRect(0,-56,560,76); g.fillStyle=css("--green"); g.font="700 36px 'Space Mono', monospace"; g.fillText("$5 OFF WITH STUDENT ID",22,-5); g.restore(); }
+  g.strokeStyle=css("--ink"); g.setLineDash([24,18]); g.beginPath(); g.moveTo(110,1430); g.lineTo(962,1430); g.stroke(); g.setLineDash([]);
+  g.font="700 32px 'Space Mono', monospace"; g.fillText(("ADMIT ONE · "+(state.school||"SONGBYRD FAN")).toUpperCase().slice(0,42),120,1490);
+  g.fillStyle=css("--yellow"); g.font="700 52px 'Space Mono', monospace"; g.fillText("Find yours →",80,1720);
+  g.fillStyle=css("--paper"); g.font="400 36px 'Space Mono', monospace"; g.fillText("scan a flyer or tap the link",80,1785);
   return c;
 }
-function wrap(g, text, x, y, maxW, lh, maxLines){
-  const words = text.split(" "); let line="", lines=0;
-  for(const w of words){ const t=line?line+" "+w:w; if(g.measureText(t).width>maxW && line){ g.fillText(line,x,y); y+=lh; line=w; if(++lines>=maxLines-1) break; } else line=t; }
-  if(line) g.fillText(line,x,y);
+function wrap(g,text,x,y,maxW,lh,maxLines){
+  const words=text.split(" "); let line="", n=0;
+  for(const w of words){ const t=line?line+" "+w:w; if(g.measureText(t).width>maxW && line){ g.fillText(line,x,y); y+=lh; line=w; if(++n>=maxLines-1) break; } else line=t; }
+  if(line) g.fillText(line,x,y); return y;
 }
 async function shareCard(){
-  const c = drawCard();
   log("share_click",{show:result.top.name});
-  c.toBlob(async blob=>{
-    const file = new File([blob],"my-songbyrd-ticket.png",{type:"image/png"});
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      try{ await navigator.share({files:[file], title:"My Songbyrd show"}); return; }catch(e){ /* cancelled */ }
-    }
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "my-songbyrd-ticket.png"; a.click();
+  drawCard().toBlob(async blob=>{
+    const file=new File([blob],"my-songbyrd-ticket.png",{type:"image/png"});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file], title:"My Songbyrd show"}); return; }catch(e){} }
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="my-songbyrd-ticket.png"; a.click();
   },"image/png");
 }
 
-/* ===================== WIRING ===================== */
+/* ================= WIRING ================= */
 $("go").addEventListener("click",()=>{
-  state.school = $("school").value; state.round=0; state.scores={}; state.picks=[];
-  state.pairs = buildPairs();
-  $("s-start").hidden = true; $("s-round").hidden = false; $("reveal").textContent="Your picks show up here.";
-  log("start"); showRound();
+  Object.keys(VIBES).forEach(t=>knownPools[t]=shuffle(VIBES[t].songs.map(([artist,song])=>({artist,song,tag:t}))));
+  Object.assign(state,{school:$("school").value, round:0, scores:{}, showBonus:{}, picks:[], used:new Set(), likedNames:[]});
+  bubbleIdx={known:0,mix:0,local:0};
+  $("s-start").hidden=true; $("s-round").hidden=false; $("reveal").textContent="Listen to both, then pick one.";
+  renderBird($("roundBird"),""); log("start"); showRound();
 });
-["A","B"].forEach(w=>{
-  const card = $("card"+w);
-  card.addEventListener("click",()=>tapCard(w));
-  card.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); tapCard(w); } });
-});
+["A","B"].forEach(w=>{ const c=$("card"+w); c.addEventListener("click",()=>tapCard(w)); c.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();tapCard(w);} }); });
 $("pickA").addEventListener("click",()=>pick("A"));
 $("pickB").addEventListener("click",()=>pick("B"));
 $("pickN").addEventListener("click",()=>pick("N"));
@@ -835,9 +874,8 @@ $("emailGo").addEventListener("click",()=>{
   const v=$("email").value.trim();
   if(!/^\S+@\S+\.\S+$/.test(v)){ $("emailMsg").textContent="That email doesn't look right. Check for typos."; return; }
   if(!$("consent").checked){ $("emailMsg").textContent="Tick the box so Songbyrd is allowed to email you."; return; }
-  log("email",{email:v, show:result && result.top ? result.top.name : ""});
-  $("emailMsg").textContent = "You're on the list. See you at Songbyrd.";
-  $("emailGo").disabled = true;
+  log("email",{email:v, show:result&&result.top?result.top.name:""});
+  $("emailMsg").textContent="You're on the list. See you at Songbyrd."; $("emailGo").disabled=true;
 });
 </script>
 </body>
