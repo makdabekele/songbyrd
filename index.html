@@ -119,7 +119,7 @@ details[open] summary::after{content:"–"}
     <div class="birdrow"><span class="birdslot" data-mood=""></span>
       <div class="bubble">8 rounds of this or that. Headphones on.</div></div>
     <div class="panel" style="display:flex;flex-direction:column;gap:14px">
-      <p>Pick the song you'd rather hear. It starts with songs you know and ends with artists playing Songbyrd this semester. We'll match you to a show.</p>
+      <p>Pick the song you'd rather hear. The first half is songs you know. The second half is artists playing Songbyrd this semester. We'll match you to a show.</p>
       <div class="field">
         <label class="cap" for="school">Where do you go?</label>
         <select id="school">
@@ -176,14 +176,15 @@ details[open] summary::after{content:"–"}
 <script>
 /* ================= CUSTOMIZE: SETTINGS ================= */
 const LOG_ENDPOINT = "https://script.google.com/macros/s/AKfycbyo0F755sIoZVwQ_pt5w5G8tcJE5nXhiTG1z0zSaEq2mC5YLlnKgUZbi-HZgoDpLhZo/exec";      // Google Apps Script web-app URL (saves plays to a Google Sheet)
+const SHOWS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmtHzQj29YbHV0TRL-l2yk_Zomh23ewQ4z4DCauFj0pm--aN-1m233wwh1ZODfTNJ977sCumEDjJOc/pub?output=csv";     // Published CSV link of your "shows" Google Sheet. Leave empty to use the built-in list below.
 const CLIP_SECONDS = 12;      // how long each clip plays
 const ASSETS = {              // put your drawings in an "assets" folder in the repo, then fill these in
   bird: "",                   // e.g. "assets/bird.png"
   birdHappy: "", birdWow: "", birdMeh: "",
   record: "",                 // e.g. "assets/record.png" (replaces the drawn record)
 };
-/* Round plan: "known" = well-known songs, "mix" = one known vs one Songbyrd artist, "local" = two Songbyrd artists. */
-const PLAN = ["known","known","known","mix","mix","local","local","local"];
+/* Round plan: "known" = well-known songs, "mix" = one known vs one Songbyrd artist (optional), "local" = two Songbyrd artists. */
+const PLAN = ["known","known","known","known","local","local","local","local"];
 
 /* Shows (from songbyrd_game_shows.csv). Each hides itself after its date. */
 const SHOWS = [
@@ -583,7 +584,53 @@ const shuffle = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.f
 const fmtDate = d => new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
 const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
-const UPCOMING = SHOWS.filter(s=>s.date>=TODAY && s.tags.length);
+let UPCOMING = SHOWS.filter(s=>s.date>=TODAY && s.tags.length);
+
+/* ---- Live show list from a published Google Sheet ---- */
+const TAGMAP = {"r&b":"soulful","soulful":"soulful","soul":"soulful","indie":"indie","rock":"indie","folk":"folk","loud":"loud",
+  "punk":"loud","metal":"loud","dance":"dance","electronic":"dance","hip-hop":"hiphop","hiphop":"hiphop","rap":"hiphop",
+  "dreamy":"dreamy","dreamy-dark":"dreamy","classic":"classic","classic-rock":"classic"};
+function parseCSV(text){
+  const rows=[]; let row=[], f="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){ f+='"'; i++; } else q=false; } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(f); f=""; }
+    else if(c==='\n'||c==='\r'){ if(c==='\r'&&text[i+1]==='\n') i++; row.push(f); rows.push(row); row=[]; f=""; }
+    else f+=c;
+  }
+  if(f||row.length){ row.push(f); rows.push(row); }
+  return rows;
+}
+function normDate(d){
+  d=(d||"").trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  const m=d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if(!m) return "";
+  const y=m[3].length===2?"20"+m[3]:m[3]; return `${y}-${m[1].padStart(2,"0")}-${m[2].padStart(2,"0")}`;
+}
+function showsFromCSV(text){
+  const rows=parseCSV(text).filter(r=>r.some(c=>c.trim()));
+  const head=rows.shift().map(h=>h.trim().toLowerCase());
+  const col=(r,name)=>{ const i=head.indexOf(name); return i<0?"":(r[i]||"").trim(); };
+  return rows.map(r=>{
+    let tags=[]; col(r,"vibe_tags").split(/[;,]/).forEach(x=>{ const t=TAGMAP[x.trim().toLowerCase().replace(/\?$/,"")]; if(t&&!tags.includes(t)) tags.push(t); });
+    if(tags.includes("loud")) tags=tags.filter(t=>t!=="indie"||/indie/i.test(col(r,"vibe_tags")));
+    const name=col(r,"headliner");
+    return {date:normDate(col(r,"date")), name, with:col(r,"supporting"), discount:/^y/i.test(col(r,"student_discount")),
+      link:col(r,"dice_link"), tags, artist:col(r,"clip_artist")||name, song:col(r,"song_title"),
+      preview:col(r,"preview_url"), start:0, note:col(r,"public_note")};
+  }).filter(s=>s.date && s.name);
+}
+async function loadShows(){
+  if(!SHOWS_CSV_URL) return;
+  const go=$("go"); go.disabled=true; go.textContent="Loading shows…";
+  try{
+    const res=await fetch(SHOWS_CSV_URL+(SHOWS_CSV_URL.includes("?")?"&":"?")+"t="+Date.now());
+    const list=showsFromCSV(await res.text());
+    if(list.length) UPCOMING=list.filter(s=>s.date>=TODAY && s.tags.length);
+  }catch(e){ /* keeps the built-in list if the sheet can't be reached */ }
+  go.disabled=false; go.textContent="Start";
+}
 
 function log(event, data={}){
   if(!LOG_ENDPOINT) return;
@@ -675,7 +722,7 @@ function nextPair(){
   const kind = PLAN[state.round], tops = topVibes();
   const lead = tops[0] || otherTag([]);
   if(kind==="known"){
-    const t1 = state.round===0 ? otherTag([]) : (state.round===2 && tops[0] ? tops[0] : otherTag([]));
+    const t1 = state.round<2 ? otherTag([]) : (tops[0] && Math.random()<.6 ? tops[0] : otherTag([]));
     const t2 = otherTag([t1]);
     return [knownSong(t1), knownSong(t2)];
   }
@@ -694,10 +741,9 @@ function renderProgress(){
   $("progress").innerHTML = PLAN.map((k,i)=>`<span class="${i<state.round?'done':i===state.round?'now':''} ${k!=='known'?'local':''}"></span>`).join("");
 }
 
-const bubbles = {known:["Round 1. Tap A, then B.","Round 2. Trust your gut.","Round 3. Last warm-up."],
-  mix:["Round 4. One of these is playing Songbyrd soon.","Round 5. Can you tell which one is local?"],
-  local:["Round 6. Both of these are Songbyrd artists.","Round 7. Getting closer to your show.","Final round."]};
-let bubbleIdx = {known:0,mix:0,local:0};
+const bubbles = {known:["Round 1. Tap A, then B.","Round 2. Trust your gut.","Round 3. Keep going.","Round 4. Last warm-up."],
+  local:["Round 5. Now it's Songbyrd artists playing this semester.","Round 6. Both of these are playing Songbyrd.","Round 7. Getting closer to your show.","Final round."]};
+let bubbleIdx = {known:0,local:0};
 
 async function showRound(){
   stopAudio(); renderProgress();
@@ -860,7 +906,7 @@ async function shareCard(){
 $("go").addEventListener("click",()=>{
   Object.keys(VIBES).forEach(t=>knownPools[t]=shuffle(VIBES[t].songs.map(([artist,song])=>({artist,song,tag:t}))));
   Object.assign(state,{playId:Math.random().toString(36).slice(2,10), school:$("school").value, round:0, scores:{}, showBonus:{}, picks:[], used:new Set(), likedNames:[]});
-  bubbleIdx={known:0,mix:0,local:0};
+  bubbleIdx={known:0,local:0};
   $("s-start").hidden=true; $("s-round").hidden=false; $("reveal").textContent="Listen to both, then pick one.";
   renderBird($("roundBird"),""); log("start"); showRound();
 });
@@ -877,6 +923,7 @@ $("emailGo").addEventListener("click",()=>{
   log("email",{email:v, show:result&&result.top?result.top.name:""});
   $("emailMsg").textContent="You're on the list. See you at Songbyrd."; $("emailGo").disabled=true;
 });
+loadShows();
 </script>
 </body>
 </html>
