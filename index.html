@@ -19,16 +19,11 @@
   --bg:var(--navy); --cardA:var(--yellow); --cardAtext:var(--navy); --cardB:var(--coral); --cardBtext:var(--yellow);
   color-scheme:light;
 }
-body.known{--bg:var(--green); --cardA:var(--yellow); --cardAtext:var(--navy); --cardB:var(--coral); --cardBtext:var(--yellow)}
-body.local{--bg:var(--coral)}
-body.local.v1{--cardA:var(--blue); --cardAtext:var(--yellow); --cardB:var(--yellow); --cardBtext:var(--navy)}
-body.local.v2{--cardA:var(--yellow); --cardAtext:var(--navy); --cardB:var(--green); --cardBtext:var(--yellow)}
-body.local.v3{--cardA:var(--green); --cardAtext:var(--yellow); --cardB:var(--blue); --cardBtext:var(--yellow)}
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;min-height:100%}
-body{background:var(--bg);transition:background .35s ease;color:var(--navy);font-family:var(--body);font-weight:500;font-size:17px;line-height:1.45;
+body{background:var(--bg);color:var(--navy);font-family:var(--body);font-weight:500;font-size:17px;line-height:1.45;
   padding:max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left))}
 .app{max-width:440px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
 p{margin:0}
@@ -39,9 +34,8 @@ p{margin:0}
 :focus-visible{outline:3px dashed var(--yellow);outline-offset:3px}
 
 /* Start screen = the Byrdland storefront: stripes, coral, light blue */
-body.start{background:
-  linear-gradient(112deg, transparent 0 26%, var(--coral) 26% 63%, var(--mint) 63%),
-  repeating-linear-gradient(135deg,#111 0 10px,#fff 10px 20px)}
+body.start{background:#61C8D7 url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 440 900%22 preserveAspectRatio=%22xMinYMin slice%22%3E %3Cdefs%3E  %3Cpattern id=%22st%22 width=%2222%22 height=%2222%22 patternUnits=%22userSpaceOnUse%22 patternTransform=%22rotate%2845%29%22%3E   %3Crect width=%2222%22 height=%2222%22 fill=%22%23fff%22/%3E%3Crect width=%2211%22 height=%2222%22 fill=%22%23111%22/%3E  %3C/pattern%3E  %3Cpattern id=%22st2%22 width=%2222%22 height=%2222%22 patternUnits=%22userSpaceOnUse%22 patternTransform=%22rotate%28-45%29%22%3E   %3Crect width=%2222%22 height=%2222%22 fill=%22%23fff%22/%3E%3Crect width=%2211%22 height=%2222%22 fill=%22%23111%22/%3E  %3C/pattern%3E %3C/defs%3E %3Crect width=%22440%22 height=%22900%22 fill=%22%2361C8D7%22/%3E %3Cpolygon points=%220,0 300,0 205,170 120,330 70,900 0,900%22 fill=%22url%28%23st%29%22/%3E %3Cpolygon points=%220,0 170,0 0,110%22 fill=%22url%28%23st2%29%22/%3E %3Cpolygon points=%22250,0 340,0 300,95 440,250 440,330 200,330 150,330%22 fill=%22%23EF3C49%22/%3E %3Cpolygon points=%22118,330 440,330 440,345 116,345%22 fill=%22%230677BD%22/%3E %3Crect x=%22116%22 y=%22345%22 width=%22324%22 height=%22555%22 fill=%22%230677BD%22/%3E %3Cpath d=%22M440,430 C360,450 345,560 380,650 C405,720 440,760 440,760 Z%22 fill=%22%23EF3C49%22/%3E %3Cpath d=%22M440,520 C405,540 400,600 420,640 C430,660 440,670 440,670 Z%22 fill=%22%2361C8D7%22/%3E%3C/svg%3E") left top / cover no-repeat}
+@media (min-width:700px){ body.start{background-size:100% auto;background-color:#0677BD} }
 body.start .topbar{background:var(--navy);padding:8px 10px;align-self:stretch}
 .mural{padding:18px 0 6px}
 h1{font-family:var(--title);font-weight:400;font-size:clamp(36px,10.5vw,58px);line-height:.95;margin:0;text-transform:uppercase;
@@ -70,13 +64,13 @@ select,input[type=email]{width:100%;font:inherit;padding:12px;border:3px solid v
 .bubble{background:var(--paper);border:3px solid var(--navy);box-shadow:var(--off) var(--off) 0 var(--navy);padding:9px 12px;font-family:var(--mono);font-size:14px}
 
 .progress{display:flex;gap:5px}
-.progress span{flex:1;height:10px;background:var(--paper);transition:background .35s}
-.progress span.done{background:var(--navy)}
+.progress span{flex:1;height:10px;background:var(--paper)}
+.progress span.done{background:var(--done,var(--navy))}
 
 /* Cards with tonearm */
 .vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .card{border:3px solid var(--navy);border-radius:0;padding:12px 8px 14px;display:flex;flex-direction:column;gap:8px;align-items:center;
-  box-shadow:var(--off) var(--off) 0 var(--navy);cursor:pointer;min-width:0;text-align:center;transition:background .35s}
+  box-shadow:var(--off) var(--off) 0 var(--navy);cursor:pointer;min-width:0;text-align:center}
 .card.a{background:var(--cardA)}.card.b{background:var(--cardB)}
 .card.a .letter{color:var(--cardAtext)}.card.b .letter{color:var(--cardBtext)}
 .card.chosen .hint{background:var(--navy);color:var(--yellow)}
@@ -216,6 +210,18 @@ const ASSETS = {              // put your drawings in an "assets" folder in the 
 };
 /* Round plan: "known" = well-known songs, "mix" = one known vs one Songbyrd artist (optional), "local" = two Songbyrd artists. */
 const PLAN = ["known","known","known","known","local","local","local","local"];
+/* One color set per round: background, card A + its text, card B + its text. Everything switches together.
+   Warm-ups use green/blue backgrounds; Songbyrd rounds use coral/navy. */
+const ROUND_COLORS = [
+  ["green","yellow","navy","coral","yellow"],
+  ["blue","coral","yellow","yellow","navy"],
+  ["green","blue","yellow","yellow","navy"],
+  ["blue","yellow","navy","green","yellow"],
+  ["coral","blue","yellow","yellow","navy"],
+  ["navy","yellow","navy","coral","yellow"],
+  ["coral","yellow","navy","green","yellow"],
+  ["navy","green","yellow","coral","yellow"],
+];
 
 /* Shows (from songbyrd_game_shows.csv). Each hides itself after its date. */
 const SHOWS = [
@@ -783,8 +789,8 @@ async function showRound(){
   stopAudio(); renderProgress();
   const kind = PLAN[state.round];
   const localN = PLAN.slice(0,state.round).filter(k=>k!=="known").length;
-  document.body.className = kind==="known" ? "known" : "local v"+((localN%3)+1);
-  applyColors();
+  document.body.className = kind==="known" ? "known" : "local";
+  applyColors(state.round);
   $("bubble").textContent = bubbles[kind][bubbleIdx[kind]++] || `Round ${state.round+1} of ${PLAN.length}`;
   let pair = nextPair();
   if(!pair[0] || !pair[1]){ pair = [knownSong(otherTag([])), knownSong(otherTag([]))]; }
@@ -795,15 +801,20 @@ async function showRound(){
 
 /* Safari can skip repainting cards with a spinning record when only the page's color variables change,
    so each round's colors are also set directly on the cards and buttons. */
-function applyColors(){
-  const cs = getComputedStyle(document.body), v = n => cs.getPropertyValue(n).trim();
-  [["A","--cardA","--cardAtext"],["B","--cardB","--cardBtext"]].forEach(([w,bg,fg])=>{
+function applyColors(i){
+  const root = getComputedStyle(document.documentElement), hex = n => root.getPropertyValue("--"+n).trim();
+  const [bg,a,at,b,bt] = ROUND_COLORS[i % ROUND_COLORS.length].map(hex);
+  const set = (n,v) => document.body.style.setProperty(n,v);
+  set("--bg",bg); set("--cardA",a); set("--cardAtext",at); set("--cardB",b); set("--cardBtext",bt);
+  document.body.style.background = bg; document.documentElement.style.background = bg;
+  set("--done", bg===hex("navy") ? hex("yellow") : hex("navy"));
+  [["A",a,at],["B",b,bt]].forEach(([w,c,f])=>{
     const card=$("card"+w), btn=$("pick"+w);
-    card.style.background=v(bg); card.querySelector(".letter").style.color=v(fg);
-    btn.style.background=v(bg); btn.style.color=v(fg);
+    card.style.background=c; card.querySelector(".letter").style.color=f;
+    btn.style.background=c; btn.style.color=f;
   });
-  document.documentElement.style.background=v("--bg");
 }
+function clearColors(){ ["--bg","--cardA","--cardAtext","--cardB","--cardBtext","--done","background"].forEach(n=>document.body.style.removeProperty(n)); document.documentElement.style.background=""; }
 
 /* If a clip won't load, quietly swap in another song from the same vibe. */
 async function ensurePlayable(i){
@@ -877,7 +888,7 @@ function rankShows(){
 
 let result=null;
 async function showResult(){
-  stopAudio(); document.body.className=""; document.documentElement.style.background="";
+  stopAudio(); document.body.className=""; clearColors();
   $("s-round").hidden=true; $("s-result").hidden=false; window.scrollTo(0,0);
   const ranked = rankShows(), top = ranked[0];
   const total = Object.values(state.scores).reduce((s,v)=>s+v,0);
@@ -983,7 +994,7 @@ $("pickA").addEventListener("click",()=>pick("A"));
 $("pickB").addEventListener("click",()=>pick("B"));
 $("pickN").addEventListener("click",()=>pick("N"));
 $("share").addEventListener("click",shareCard);
-$("again").addEventListener("click",()=>{ stopAudio(); document.body.className="start"; document.documentElement.style.background=""; $("s-result").hidden=true; $("s-start").hidden=false; window.scrollTo(0,0); });
+$("again").addEventListener("click",()=>{ stopAudio(); document.body.className="start"; clearColors(); $("s-result").hidden=true; $("s-start").hidden=false; window.scrollTo(0,0); });
 $("emailGo").addEventListener("click",()=>{
   const v=$("email").value.trim();
   if(!/^\S+@\S+\.\S+$/.test(v)){ $("emailMsg").textContent="That email doesn't look right. Check for typos."; return; }
