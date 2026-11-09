@@ -44,11 +44,9 @@ body.start{background:
   repeating-linear-gradient(135deg,#111 0 10px,#fff 10px 20px)}
 body.start .topbar{background:var(--navy);padding:8px 10px;align-self:stretch}
 .mural{padding:18px 0 6px}
-h1{font-family:var(--title);font-weight:400;font-size:clamp(34px,10vw,48px);line-height:.95;margin:0;text-transform:uppercase;
-  color:var(--yellow);overflow-wrap:anywhere;
-  text-shadow:0 0 0 var(--blue), 0 2px 14px rgba(17,17,17,.55), 0 0 3px rgba(17,17,17,.45)}
-h1:hover{text-shadow:var(--off) var(--off) 0 var(--blue), 0 2px 14px rgba(17,17,17,.55), 0 0 3px rgba(17,17,17,.45)}
-@media (hover:none){ h1{text-shadow:var(--off) var(--off) 0 var(--blue), 0 2px 14px rgba(17,17,17,.55), 0 0 3px rgba(17,17,17,.45)} }
+h1{font-family:var(--title);font-weight:400;font-size:clamp(36px,10.5vw,58px);line-height:.95;margin:0;text-transform:uppercase;
+  color:var(--yellow);overflow-wrap:anywhere;text-shadow:var(--off) var(--off) 0 var(--blue)}
+h1:hover{text-shadow:calc(var(--off) + 3px) calc(var(--off) + 3px) 0 var(--blue)}
 .lede{color:var(--paper);font-size:17px}
 
 /* Buttons: flat color, shadow slides out on hover */
@@ -81,7 +79,9 @@ select,input[type=email]{width:100%;font:inherit;padding:12px;border:3px solid v
   box-shadow:var(--off) var(--off) 0 var(--navy);cursor:pointer;min-width:0;text-align:center;transition:background .35s}
 .card.a{background:var(--cardA)}.card.b{background:var(--cardB)}
 .card.a .letter{color:var(--cardAtext)}.card.b .letter{color:var(--cardBtext)}
-.card.chosen{box-shadow:var(--off) var(--off) 0 var(--navy), 0 0 0 4px var(--paper)}
+.card.chosen .hint{background:var(--navy);color:var(--yellow)}
+.card:focus:not(:focus-visible),.btn:focus:not(:focus-visible){outline:none}
+.card{-webkit-tap-highlight-color:transparent}
 .letter{font-family:var(--title);font-size:28px;line-height:1}
 .deck{position:relative;width:100%;max-width:140px;aspect-ratio:1}
 .record{position:absolute;inset:6% 12% 6% 0;border-radius:50%;background:repeating-radial-gradient(circle,#141f45 0 3px,#26386f 3px 5px);background-size:cover;display:grid;place-items:center}
@@ -784,12 +784,25 @@ async function showRound(){
   const kind = PLAN[state.round];
   const localN = PLAN.slice(0,state.round).filter(k=>k!=="known").length;
   document.body.className = kind==="known" ? "known" : "local v"+((localN%3)+1);
+  applyColors();
   $("bubble").textContent = bubbles[kind][bubbleIdx[kind]++] || `Round ${state.round+1} of ${PLAN.length}`;
   let pair = nextPair();
   if(!pair[0] || !pair[1]){ pair = [knownSong(otherTag([])), knownSong(otherTag([]))]; }
   state.cur = pair;
   ["A","B"].forEach(w=>{ $("hint"+w).textContent="▶ Play"; $("card"+w).classList.remove("chosen"); });
   pair.forEach(p=>{ p.trackP = p.preview ? Promise.resolve({url:p.preview}) : lookup(p.artist,p.song); });
+}
+
+/* Safari can skip repainting cards with a spinning record when only the page's color variables change,
+   so each round's colors are also set directly on the cards and buttons. */
+function applyColors(){
+  const cs = getComputedStyle(document.body), v = n => cs.getPropertyValue(n).trim();
+  [["A","--cardA","--cardAtext"],["B","--cardB","--cardBtext"]].forEach(([w,bg,fg])=>{
+    const card=$("card"+w), btn=$("pick"+w);
+    card.style.background=v(bg); card.querySelector(".letter").style.color=v(fg);
+    btn.style.background=v(bg); btn.style.color=v(fg);
+  });
+  document.documentElement.style.background=v("--bg");
 }
 
 /* If a clip won't load, quietly swap in another song from the same vibe. */
@@ -809,13 +822,15 @@ async function tapCard(w){
   const i = w==="A"?0:1, card=$("card"+w), hint=$("hint"+w);
   if(playingCard===card){ stopAudio(); hint.textContent="▶ Replay"; return; }
   hint.textContent="Loading…";
+  const myRound = state.round;
   const [p,t] = await ensurePlayable(i);
+  if(state.round!==myRound) return;
   const ok = await playClip(card, t);
   hint.textContent = ok ? "■ Playing" : "No clip, skip it";
 }
 
 function pick(choice){
-  stopAudio();
+  stopAudio(); ["A","B"].forEach(w=>{ $("card"+w).classList.remove("playing"); $("card"+w).blur(); });
   const [a,b] = state.cur; let html;
   // freeze this round's card colors so the reveal keeps them after the next round recolors the screen
   const cs = getComputedStyle(document.body), rv = $("reveal");
@@ -829,7 +844,7 @@ function pick(choice){
     html = `<div>Neither. That was ${nameOf(a)} and ${nameOf(b)}.</div>`;
   } else {
     const win = choice==="A"?a:b, lose = choice==="A"?b:a; order=[win,lose];
-    $("card"+choice).classList.add("chosen");
+    $("card"+choice).classList.add("chosen"); $("hint"+choice).textContent="✓ Picked";
     (win.show ? win.show.tags : [win.tag]).forEach(t=>state.scores[t]=(state.scores[t]||0)+1);
     if(win.show){ state.showBonus[win.show.name]=(state.showBonus[win.show.name]||0)+1; }
     state.likedNames.push(win.artist);
@@ -862,7 +877,7 @@ function rankShows(){
 
 let result=null;
 async function showResult(){
-  stopAudio(); document.body.className="";
+  stopAudio(); document.body.className=""; document.documentElement.style.background="";
   $("s-round").hidden=true; $("s-result").hidden=false; window.scrollTo(0,0);
   const ranked = rankShows(), top = ranked[0];
   const total = Object.values(state.scores).reduce((s,v)=>s+v,0);
@@ -968,7 +983,7 @@ $("pickA").addEventListener("click",()=>pick("A"));
 $("pickB").addEventListener("click",()=>pick("B"));
 $("pickN").addEventListener("click",()=>pick("N"));
 $("share").addEventListener("click",shareCard);
-$("again").addEventListener("click",()=>{ stopAudio(); document.body.className="start"; $("s-result").hidden=true; $("s-start").hidden=false; window.scrollTo(0,0); });
+$("again").addEventListener("click",()=>{ stopAudio(); document.body.className="start"; document.documentElement.style.background=""; $("s-result").hidden=true; $("s-start").hidden=false; window.scrollTo(0,0); });
 $("emailGo").addEventListener("click",()=>{
   const v=$("email").value.trim();
   if(!/^\S+@\S+\.\S+$/.test(v)){ $("emailMsg").textContent="That email doesn't look right. Check for typos."; return; }
