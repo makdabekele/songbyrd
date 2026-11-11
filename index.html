@@ -144,7 +144,7 @@ details[open] summary::after{content:"–"}
     <div class="mural"><h1 class="slide">Find your Songbyrd show</h1></div>
     <div class="birdrow"><span class="birdslot" data-mood=""></span><div class="bubble">Headphones on.</div></div>
     <div class="panel" style="display:flex;flex-direction:column;gap:14px">
-      <p>8 rounds of this or that. The first half is songs you know. The second half is artists playing Songbyrd this semester. We'll match you to a show.</p>
+      <p>8 rounds of this or that. Each round helps us match you to an upcoming Songbyrd show! Happy listening :).</p>
       <div class="field">
         <label class="cap" for="school">Where do you go?</label>
         <select id="school">
@@ -210,15 +210,15 @@ const ASSETS = {              // put your drawings in an "assets" folder in the 
   arm: "",                    // e.g. "assets/arm.png" (replaces the drawn tonearm)
 };
 /* Round plan: "known" = well-known songs, "mix" = one known vs one Songbyrd artist (optional), "local" = two Songbyrd artists. */
-const PLAN = ["known","known","known","known","local","local","local","local"];
+const PLAN = ["known","known","known","local","local","local","local","local"];
 /* One color set per round: background, card A + its text, card B + its text. Everything switches together.
    Warm-ups use green/blue backgrounds; Songbyrd rounds use coral/navy. */
 const ROUND_COLORS = [
   ["green","yellow","navy","coral","yellow"],
   ["blue","coral","yellow","yellow","navy"],
   ["green","blue","yellow","yellow","navy"],
-  ["blue","yellow","navy","green","yellow"],
   ["coral","blue","yellow","yellow","navy"],
+  ["navy","coral","yellow","green","yellow"],
   ["navy","yellow","navy","coral","yellow"],
   ["coral","yellow","navy","green","yellow"],
   ["navy","green","yellow","coral","yellow"],
@@ -784,8 +784,8 @@ function renderProgress(){
   $("progress").innerHTML = PLAN.map((k,i)=>`<span class="${i<state.round?'done':''}"></span>`).join("");
 }
 
-const bubbles = {known:["Round 1. Tap A, then B.","Round 2. Trust your gut.","Round 3. Keep going.","Round 4. Last warm-up."],
-  local:["Round 5. Now it's Songbyrd artists playing this semester.","Round 6. Both of these are playing Songbyrd.","Round 7. Getting closer to your show.","Final round."]};
+const bubbles = {known:["Round 1. Tap A, then B.","Round 2. Trust your gut.","Round 3. Last warm-up."],
+  local:["Round 4. Now it's Songbyrd artists playing this semester.","Round 5. Both of these are playing Songbyrd.","Round 6. Keep going.","Round 7. Getting closer to your show.","Final round."]};
 let bubbleIdx = {known:0,local:0};
 
 async function showRound(){
