@@ -753,7 +753,8 @@ function localSong(prefTag, avoidTag){
   if(!cands.length) cands = fresh.filter(s=>!s.tags.includes(avoidTag));
   if(!cands.length) cands = fresh;
   if(!cands.length) return null;
-  const s = shuffle(cands)[0]; state.used.add(s.name);
+  const s = shuffle(cands).sort((x,y)=>(seenRound[x.name]||0)-(seenRound[y.name]||0))[0]; state.used.add(s.name);
+  remember(seenRound, "sbSeenRound", s.name);
   return {artist:s.artist, song:s.song, tag:s.tags[0], show:s, preview:s.preview};
 }
 function otherTag(not){ return shuffle(Object.keys(VIBES).filter(t=>!not.includes(t)))[0]; }
@@ -872,19 +873,35 @@ function pick(choice){
   if(state.round>=PLAN.length) setTimeout(showResult, 1400); else setTimeout(showRound, 250);
 }
 
-/* Matching: vibe fit plus a big boost for any Songbyrd artist you picked directly. */
+/* Matching, built for variety:
+   - a show's vibe score is averaged across its tags, so two-tag shows don't win more often just for having two tags
+   - picking a Songbyrd artist in a round counts the most
+   - shows this device has already been matched to fade, so replays surface new ones
+   - near-ties (within 10% of the best) are broken at random, not by date or discount */
+let seenMatch = {}, seenRound = {};
+try{ seenMatch = JSON.parse(localStorage.getItem("sbSeenMatch")||"{}"); seenRound = JSON.parse(localStorage.getItem("sbSeenRound")||"{}"); }catch(e){}
+function remember(store, key, name){ store[name]=(store[name]||0)+1; try{ localStorage.setItem(key, JSON.stringify(store)); }catch(e){} }
 function rankShows(){
   const total = Object.values(state.scores).reduce((s,v)=>s+v,0) || 1;
   const share = t => (state.scores[t]||0)/total;
   const scored = UPCOMING.map(s=>{
-    const vals = s.tags.map(share).sort((x,y)=>y-x);
-    const fit = (vals[0]||0) + .5*(vals[1]||0) + .6*(state.showBonus[s.name]||0);
-    const days = (new Date(s.date)-new Date(TODAY))/864e5;
-    return {...s, fit, rank: fit + (s.discount?.04:0) - days*.0005};
-  }).sort((x,y)=>y.rank-x.rank);
-  const best = scored[0] ? scored[0].fit || 1 : 1;
-  scored.forEach((s,i)=>s.pct = Math.max(60, Math.round(72 + 27*(s.fit/best)) - i));
-  return scored;
+    const vibe = s.tags.reduce((a,t)=>a+share(t),0)/Math.sqrt(s.tags.length);
+    const fit = vibe + .8*(state.showBonus[s.name]||0) - .15*(seenMatch[s.name]||0);
+    return {...s, fit};
+  }).sort((x,y)=>y.fit-x.fit);
+  if(!scored.length) return scored;
+  const best = scored[0].fit;
+  const close = scored.filter(s=>s.fit >= best - Math.abs(best)*.1);
+  const top = close[Math.floor(Math.random()*close.length)];
+  // runner-ups: best of the rest, preferring a different main vibe from your match
+  const rest = scored.filter(s=>s!==top);
+  const diff = rest.filter(s=>s.tags[0]!==top.tags[0]);
+  const runners = [...diff.slice(0,1), ...rest.filter(s=>!diff.slice(0,1).includes(s))].slice(0,2);
+  const ranked = [top, ...runners, ...rest.filter(s=>!runners.includes(s))];
+  const hi = Math.max(...ranked.slice(0,3).map(s=>s.fit), .0001);
+  ranked.forEach((s,i)=>s.pct = Math.max(60, Math.min(99, Math.round(72 + 27*(s.fit/hi)) - i)));
+  ranked[0].pct = Math.max(ranked[0].pct, (ranked[1]?ranked[1].pct:0)+1);
+  return ranked;
 }
 
 let result=null;
@@ -892,6 +909,7 @@ async function showResult(){
   stopAudio(); document.body.className=""; clearColors();
   $("s-round").hidden=true; $("s-result").hidden=false; window.scrollTo(0,0);
   const ranked = rankShows(), top = ranked[0];
+  if(top) remember(seenMatch, "sbSeenMatch", top.name);
   const total = Object.values(state.scores).reduce((s,v)=>s+v,0);
   const mix = total ? Object.entries(state.scores).sort((a,b)=>b[1]-a[1]).map(([t,v])=>({label:VIBES[t].label, pct:Math.round(100*v/total)})) : [];
   result = {top, mix};
