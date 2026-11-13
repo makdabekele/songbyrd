@@ -195,19 +195,12 @@ details[open] summary::after{content:"–"}
       <button class="btn slide alt" id="again">Play again</button>
     </div>
     <details id="history"><summary>Replay your picks</summary><div class="hist" id="hist"></div></details>
-    <details id="stats"><summary>See your taste breakdown</summary><div class="mix" id="mix"></div></details>
     <div class="panel" style="display:flex;flex-direction:column;gap:10px">
       <div><b class="cap">More upcoming shows at Songbyrd</b><p class="small">Songbyrd is a 250-person music venue in Union Market, NE DC. These are two more shows you might like.</p></div>
       <div id="runners" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
+    <details id="crate"><summary>Hear everyone else playing Songbyrd</summary><div class="hist" id="crateList"></div></details>
     <div class="panel also" id="also"></div>
-    <div class="panel" style="display:flex;flex-direction:column;gap:10px">
-      <label class="cap" for="email">Want a reminder before your show?</label>
-      <input type="email" id="email" placeholder="you@school.edu" autocomplete="email">
-      <label class="check" for="consent"><input type="checkbox" id="consent"> <span>Songbyrd can email me about upcoming shows. Unsubscribe anytime.</span></label>
-      <button class="btn slide" id="emailGo">Send it</button>
-      <p class="small" id="emailMsg"></p>
-    </div>
   </section>
 </main>
 
@@ -887,7 +880,7 @@ function pick(choice){
     html = `<div>You picked ${nameOf(win)} over ${nameOf(lose)}.</div>`;
   }
   const tickets = order.map(tix).join("");
-  if(tickets) html += `<div class="cap">Playing Songbyrd soon</div><div class="tixrow">${tickets}</div>`;
+  if(tickets) html += `<div class="cap">Playing at <a href="https://songbyrddc.com/" target="_blank" rel="noopener" style="color:inherit">Songbyrd Music House</a> soon</div><div class="tixrow">${tickets}</div>`;
   state.picks.push({a:a.artist+" - "+a.song, b:b.artist+" - "+b.song, choice});
   state.history.push({a, b, choice});
   rv.innerHTML = html;
@@ -981,7 +974,6 @@ async function showResult(){
     $("apple").innerHTML = ok ? (t.link?`<a href="${esc(t.link)}" target="_blank" rel="noopener" style="color:inherit">${esc(t.title||top.song)}, on Apple Music</a>`:"")
                               : `Couldn't load a clip. Search "${esc(top.song)}" by ${esc(top.artist)} in your music app.`;
   });
-  $("mix").innerHTML = mix.length ? mix.map(m=>`<div class="mixrow"><span>${m.label}</span><span class="mixbar"><i style="width:${m.pct}%"></i></span><span class="pct">${m.pct}%</span></div>`).join("") : `<p>You skipped every round, so no breakdown this time.</p>`;
   $("runners").innerHTML = ranked.slice(1,3).map(s=>`
     <div class="runner"><div><div class="n">${esc(s.name)}</div><div class="small">${fmtDate(s.date)}${s.discount?" · $5 off w/ student ID":""}</div></div>
     <a href="${esc(s.link)}" target="_blank" rel="noopener" data-show="${esc(s.name)}">Tickets →</a></div>`).join("");
@@ -990,7 +982,23 @@ async function showResult(){
       <span>${won?"✓ ":""}${p.show?esc(p.artist):`${esc(p.song)} · ${esc(p.artist)}`}${p.show?`<span class="tag2">${esc(fmtDate(p.show.date))}</span>`:""}</span></div>`;
     return `<div class="hround"><span class="rn">Round ${i+1}${h.choice==="N"?" · skipped":""}</span>${row(h.a,h.choice==="A",i+"a")}${row(h.b,h.choice==="B",i+"b")}</div>`;
   }).join("");
+  const heardNames = new Set(state.history.flatMap(h=>[h.a,h.b]).filter(p=>p.show).map(p=>p.show.name));
+  const shown = new Set(ranked.slice(0,3).map(s=>s.name));
+  const others = UPCOMING.filter(s=>!heardNames.has(s.name) && !shown.has(s.name)).sort((x,y)=>x.date<y.date?-1:1);
+  $("crate").hidden = !others.length;
+  $("crateList").innerHTML = `<p class="small">Songbyrd artists you didn't hear in this game, in date order.</p>` + others.map((s,i)=>`
+    <div class="hrow" style="border-top:2px dashed var(--navy);padding-top:8px"><button class="hplay" data-c="${i}" aria-label="Play ${esc(s.artist)}">▶</button>
+      <span style="flex:1">${esc(s.name)}<span class="tag2">${esc(fmtDate(s.date))}</span>${s.discount?'<span class="tag2" style="background:var(--green);color:#fff">$5 student</span>':''}</span>
+      <a href="${esc(s.link)}" target="_blank" rel="noopener" data-show="${esc(s.name)}" style="font-family:var(--mono);font-weight:700;font-size:13px;color:var(--navy);white-space:nowrap">Tickets →</a></div>`).join("");
   let histOn=null;
+  $("crateList").querySelectorAll(".hplay").forEach(btn=>btn.addEventListener("click", async ()=>{
+    if(histOn===btn){ stopAudio(); return; }
+    const s=others[parseInt(btn.dataset.c)];
+    btn.textContent="…"; const tr = s.preview ? {url:s.preview} : await lookup(s.artist, s.song); const ok=await playClip(null,tr,s.start||0);
+    btn.textContent= ok ? "❚❚" : "×";
+    if(ok){ histOn=btn; onStop=()=>{ btn.textContent="▶"; histOn=null; }; }
+  }));
+  $("crateList").querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>log("tickets_click",{show:a.dataset.show, slot:"crate"})));
   $("hist").querySelectorAll(".hplay").forEach(btn=>btn.addEventListener("click", async ()=>{
     if(histOn===btn){ stopAudio(); return; }
     const k=btn.dataset.k, h=state.history[parseInt(k)], p=k.endsWith("a")?h.a:h.b;
@@ -1068,13 +1076,6 @@ $("go").addEventListener("click",()=>{
 $("pickN").addEventListener("click",()=>pick("N"));
 $("share").addEventListener("click",shareCard);
 $("again").addEventListener("click",()=>{ stopAudio(); document.body.className="start"; clearColors(); $("s-result").hidden=true; $("s-start").hidden=false; window.scrollTo(0,0); });
-$("emailGo").addEventListener("click",()=>{
-  const v=$("email").value.trim();
-  if(!/^\S+@\S+\.\S+$/.test(v)){ $("emailMsg").textContent="That email doesn't look right. Check for typos."; return; }
-  if(!$("consent").checked){ $("emailMsg").textContent="Tick the box so Songbyrd is allowed to email you."; return; }
-  log("email",{email:v, show:result&&result.top?result.top.name:""});
-  $("emailMsg").textContent="You're on the list. See you at Songbyrd."; $("emailGo").disabled=true;
-});
 loadShows();
 </script>
 </body>
