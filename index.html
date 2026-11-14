@@ -209,6 +209,7 @@ details[open] summary::after{content:"–"}
 const LOG_ENDPOINT = "https://script.google.com/macros/s/AKfycbyo0F755sIoZVwQ_pt5w5G8tcJE5nXhiTG1z0zSaEq2mC5YLlnKgUZbi-HZgoDpLhZo/exec";      // Google Apps Script web-app URL (saves plays to a Google Sheet)
 const SHOWS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRmtHzQj29YbHV0TRL-l2yk_Zomh23ewQ4z4DCauFj0pm--aN-1m233wwh1ZODfTNJ977sCumEDjJOc/pub?output=csv";     // Published CSV link of your "shows" Google Sheet. Leave empty to use the built-in list below.
 const CLIP_SECONDS = 12;      // how long each clip plays
+const GAME_URL = "makdabekele.github.io/songbyrd";   // printed on the shared ticket image
 const ASSETS = {              // put your drawings in an "assets" folder in the repo, then fill these in
   bird: "",                   // e.g. "assets/bird.png"
   birdHappy: "", birdWow: "", birdMeh: "",
@@ -1014,33 +1015,41 @@ async function showResult(){
 }
 
 /* Share image for Instagram Stories (1080x1920). */
+const birdImg = new Image(); birdImg.src = ASSETS.bird || BIRD_DEFAULT;   // drawn on the shared ticket
 function drawCard(){
   const {top} = result; const c=document.createElement("canvas"); c.width=1080; c.height=1920; const g=c.getContext("2d");
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const NAVY=css("--navy"), YEL=css("--yellow"), BLUE=css("--blue"), COR=css("--coral"), MINT=css("--mint"), PAPER=css("--paper"), GREEN=css("--green");
+  const T = (w,s) => `${w} ${s}px 'Archivo Black', 'Arial Black', sans-serif`, M = (w,s) => `${w} ${s}px 'Space Mono', monospace`, B = (w,s) => `${w} ${s}px Archivo, sans-serif`;
   g.fillStyle=NAVY; g.fillRect(0,0,1080,1920);
   // Byrdland band behind the headline
-  g.save(); g.beginPath(); g.rect(0,120,1080,330); g.clip();
-  for(let x=-600;x<1300;x+=36){ g.fillStyle="#111"; g.beginPath(); g.moveTo(x,120); g.lineTo(x+18,120); g.lineTo(x+18+330,450); g.lineTo(x+330,450); g.fill(); }
-  g.fillStyle="#fff"; g.globalCompositeOperation="destination-over"; g.fillRect(0,120,1080,330); g.globalCompositeOperation="source-over";
-  g.fillStyle=COR; g.beginPath(); g.moveTo(330,120); g.lineTo(1080,120); g.lineTo(1080,450); g.lineTo(200,450); g.fill();
-  g.fillStyle=MINT; g.beginPath(); g.moveTo(700,120); g.lineTo(1080,120); g.lineTo(1080,450); g.lineTo(570,450); g.fill();
+  g.save(); g.beginPath(); g.rect(0,110,1080,330); g.clip();
+  g.fillStyle="#fff"; g.fillRect(0,110,1080,330);
+  g.fillStyle="#111"; for(let x=-600;x<1300;x+=36){ g.beginPath(); g.moveTo(x,110); g.lineTo(x+18,110); g.lineTo(x+348,440); g.lineTo(x+330,440); g.fill(); }
+  g.fillStyle=COR; g.beginPath(); g.moveTo(250,110); g.lineTo(1080,110); g.lineTo(1080,440); g.lineTo(130,440); g.fill();
+  g.fillStyle=MINT; g.beginPath(); g.moveTo(760,110); g.lineTo(1080,110); g.lineTo(1080,440); g.lineTo(620,440); g.fill();
   g.restore();
-  g.font="400 104px 'Archivo Black', 'Arial Black', sans-serif";
-  g.fillStyle=BLUE; g.fillText("MY SONGBYRD",68,266); g.fillText("SHOW IS…",68,386);
-  g.fillStyle=YEL; g.fillText("MY SONGBYRD",60,258); g.fillText("SHOW IS…",60,378);
-  g.fillStyle=NAVY; g.fillRect(100,540,900,1000);
-  g.fillStyle=PAPER; g.fillRect(80,520,900,1000);
-  g.fillStyle=NAVY; g.fillRect(80,520,900,90);
-  g.fillStyle=YEL; g.font="700 36px 'Space Mono', monospace"; g.fillText(`YOUR SONGBYRD SHOW · ${top.pct}%`,120,580);
-  g.fillStyle=NAVY; g.font="400 84px 'Archivo Black', 'Arial Black', sans-serif"; const yEnd = wrap(g, top.name.toUpperCase(), 120, 740, 820, 92, 4);
-  g.font="700 50px 'Space Mono', monospace"; g.fillText(fmtDate(top.date), 120, yEnd+110);
-  g.font="500 40px Archivo, sans-serif"; g.fillText("Songbyrd · 540 Penn St NE, DC", 120, yEnd+175);
-  if(top.discount){ g.save(); g.translate(120,yEnd+290); g.rotate(-.05); g.fillStyle=GREEN; g.fillRect(0,-56,540,76); g.fillStyle="#fff"; g.font="700 36px 'Space Mono', monospace"; g.fillText("$5 OFF WITH STUDENT ID",22,-5); g.restore(); }
-  g.strokeStyle=NAVY; g.lineWidth=6; g.setLineDash([24,18]); g.beginPath(); g.moveTo(110,1420); g.lineTo(950,1420); g.stroke(); g.setLineDash([]);
-  g.fillStyle=NAVY; g.font="700 32px 'Space Mono', monospace"; g.fillText(("ADMIT ONE · "+(state.school||"SONGBYRD FAN")).toUpperCase().slice(0,40),120,1480);
-  g.fillStyle=YEL; g.font="400 56px 'Archivo Black', 'Arial Black', sans-serif"; g.fillText("FIND YOURS →",80,1720);
-  g.fillStyle=PAPER; g.font="400 36px 'Space Mono', monospace"; g.fillText("scan a flyer or tap the link",80,1790);
+  g.font=T(400,104); g.fillStyle=BLUE; g.fillText("MY SONGBYRD",68,258); g.fillText("SHOW IS…",68,378);
+  g.fillStyle=YEL; g.fillText("MY SONGBYRD",60,250); g.fillText("SHOW IS…",60,370);
+  // ticket
+  const X=80, Y=520, W=920, H=1060;
+  g.fillStyle=BLUE; g.fillRect(X+18,Y+18,W,H);
+  g.fillStyle=PAPER; g.fillRect(X,Y,W,H);
+  g.fillStyle=COR; g.fillRect(X,Y,W,92);
+  g.fillStyle=YEL; g.font=M(700,34); g.fillText("YOUR SONGBYRD MATCH", X+40, Y+60);
+  g.textAlign="right"; g.fillText(top.pct+"%", X+W-40, Y+60); g.textAlign="left";
+  g.fillStyle=NAVY; g.font=T(400,82); let y = wrap(g, top.name.toUpperCase(), X+40, Y+210, W-80, 90, 3);
+  y+=95; g.font=M(700,50); g.fillText(fmtDate(top.date), X+40, y);
+  y+=62; g.font=B(500,38); g.fillText("Songbyrd Music House · 540 Penn St NE", X+40, y);
+  if(top.with){ y+=56; g.font=B(500,34); wrap(g, "with "+top.with, X+40, y, W-380, 44, 2); }
+  // the bird fills the open corner of the ticket
+  if(birdImg.complete && birdImg.naturalWidth){ const bh=400, bw=bh*birdImg.naturalWidth/birdImg.naturalHeight; g.drawImage(birdImg, X+W-bw-50, Y+H-bh-150, bw, bh); }
+  if(top.discount){ g.save(); g.translate(X+40, Y+H-230); g.rotate(-.05); g.fillStyle=GREEN; g.fillRect(0,-58,520,80); g.fillStyle="#fff"; g.font=M(700,36); g.fillText("$5 OFF W/ STUDENT ID",22,-5); g.restore(); }
+  g.strokeStyle=NAVY; g.lineWidth=6; g.setLineDash([24,18]); g.beginPath(); g.moveTo(X+30,Y+H-120); g.lineTo(X+W-30,Y+H-120); g.stroke(); g.setLineDash([]);
+  g.fillStyle=NAVY; g.font=M(700,32); g.fillText(("ADMIT ONE · "+(state.school||"SONGBYRD FAN")).toUpperCase().slice(0,40), X+40, Y+H-55);
+  // how to play, readable in a saved image
+  g.fillStyle=YEL; g.font=T(400,54); g.fillText("FIND YOUR SONGBYRD SHOW", 80, 1730);
+  g.fillStyle=PAPER; g.font=M(700,40); g.fillText(GAME_URL, 80, 1800);
   return c;
 }
 function wrap(g,text,x,y,maxW,lh,maxLines){
